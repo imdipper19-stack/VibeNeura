@@ -1,0 +1,113 @@
+{
+  "app": {
+    "name": "vibeneura",
+    "tagline": "Premium AI models without limits"
+  },
+  "nav": {
+    "newChat": "New chat",
+    "history": "History",
+    "settings": "Settings",
+    "billing": "Billing",
+    "logout": "Sign out",
+    "login": "Sign in",
+    "register": "Sign up",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This week",
+    "older": "Older"
+  },
+  "chat": {
+    "placeholder": "Ask anything...",
+    "send": "Send",
+    "attach": "Attach file",
+    "photo": "Take a photo",
+    "webSearch": "Web search",
+    "model": "Model",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "stop": "Stop",
+    "thinking": "Thinking...",
+    "emptyTitle": "Where shall we begin?",
+    "emptySubtitle": "Pick a model and ask a question. Vibeneura works without a VPN.",
+    "rename": "Rename",
+    "archive": "Archive",
+    "delete": "Delete",
+    "renameTitle": "Rename chat",
+    "renamePlaceholder": "Chat name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirmDelete": "Delete this chat?",
+    "suggestions": {
+      "code": "Explain this code",
+      "summarize": "Summarize a text",
+      "translate": "Translate to Russian",
+      "brainstorm": "Brainstorm ideas"
+    }
+  },
+  "billing": {
+    "balance": "Balance",
+    "tokens": "tokens",
+    "topup": "Top up",
+    "premium": "Premium",
+    "free": "Free",
+    "upgrade": "Upgrade to Premium",
+    "tokenPacksTitle": "Token packs",
+    "tokenPacksSubtitle": "One-time top-up, no subscription. Tokens never expire.",
+    "passesTitle": "PRO Passes",
+    "passesSubtitle": "Unlimited access to premium models. No auto-renewal.",
+    "buy": "Buy",
+    "popular": "popular",
+    "bestValue": "best value",
+    "days": "days",
+    "proPassActive": "PRO Pass active until",
+    "urgent": "Emergency",
+    "paywallTitle": "Photos need a smart model",
+    "paywallBody": "Llama 3 can't analyse images. Grab a token pack from 99 ₽ and use Claude Sonnet to solve problems from a photo.",
+    "paywallCta": "Buy for 99 ₽"
+  },
+  "models": {
+    "free": "Free",
+    "premium": "Premium",
+    "vision": "Vision",
+    "selectModel": "Select model"
+  },
+  "auth": {
+    "loginTitle": "Sign in with one click",
+    "loginSubtitle": "No emails, no passwords. Link an account and go.",
+    "googleCta": "Continue with Google",
+    "telegramCta": "Continue with Telegram",
+    "noEmailNeeded": "No forms. No spam.",
+    "telegramHint": "Use Telegram to sign in on mobile",
+    "agreeTerms": "By continuing you agree to the {terms} and {privacy}.",
+    "termsLabel": "Terms",
+    "privacyLabel": "Privacy Policy"
+  },
+  "referral": {
+    "title": "Invite a friend",
+    "subtitle": "Get 10,000 PRO tokens each time a friend makes their first purchase.",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "invitedCount": "invited: {count}",
+    "earned": "tokens earned: {count}"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close"
+  },
+  "landing": {
+    "heroTitle": "Every top-tier AI in one window",
+    "heroSubtitle": "GPT, Claude, Vibeneura with no VPN and no limits. Pay only for what you use.",
+    "ctaPrimary": "Start free",
+    "ctaSecondary": "Learn more",
+    "feature1Title": "No VPN required",
+    "feature1Desc": "All requests are proxied server-side. Full access from anywhere.",
+    "feature2Title": "Every model",
+    "feature2Desc": "GPT 5.4, Claude Opus 4.6, VibeneuraAI — switch with one click.",
+    "feature3Title": "Transparent pricing",
+    "feature3Desc": "Buy tokens or subscribe to Premium. No hidden fees."
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "app": {
+    "name": "vibeneura",
+    "tagline": "Премиальные ИИ-модели без ограничений"
+  },
+  "nav": {
+    "newChat": "Новый чат",
+    "history": "История",
+    "settings": "Настройки",
+    "billing": "Оплата",
+    "logout": "Выйти",
+    "login": "Войти",
+    "register": "Регистрация",
+    "today": "Сегодня",
+    "yesterday": "Вчера",
+    "thisWeek": "На этой неделе",
+    "older": "Ранее"
+  },
+  "chat": {
+    "placeholder": "Спросите что угодно...",
+    "send": "Отправить",
+    "attach": "Прикрепить файл",
+    "photo": "Сделать фото",
+    "webSearch": "Веб-поиск",
+    "model": "Модель",
+    "regenerate": "Повторить",
+    "copy": "Скопировать",
+    "stop": "Остановить",
+    "thinking": "Думаю...",
+    "emptyTitle": "С чего начнём?",
+    "emptySubtitle": "Выберите модель и задайте вопрос. Vibeneura работает без VPN.",
+    "rename": "Переименовать",
+    "archive": "Архивировать",
+    "delete": "Удалить",
+    "renameTitle": "Переименовать чат",
+    "renamePlaceholder": "Название чата",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "confirmDelete": "Удалить этот чат?",
+    "suggestions": {
+      "code": "Объясни этот код",
+      "summarize": "Сделай краткое содержание",
+      "translate": "Переведи на английский",
+      "brainstorm": "Помоги с идеями"
+    }
+  },
+  "billing": {
+    "balance": "Баланс",
+    "tokens": "токенов",
+    "topup": "Пополнить",
+    "premium": "Premium",
+    "free": "Бесплатно",
+    "upgrade": "Перейти на Premium",
+    "tokenPacksTitle": "Пакеты токенов",
+    "tokenPacksSubtitle": "Разовое пополнение, без подписки. Токены не сгорают.",
+    "passesTitle": "PRO Passes",
+    "passesSubtitle": "Безлимит на премиум-модели. Без автопродления.",
+    "buy": "Купить",
+    "popular": "хит",
+    "bestValue": "выгодно",
+    "days": "дней",
+    "proPassActive": "PRO Pass активен до",
+    "urgent": "Экстренный",
+    "paywallTitle": "Для работы с фото нужна умная модель",
+    "paywallBody": "Llama 3 не умеет анализировать изображения. Купите пакет токенов от 99 ₽ и используйте Claude Sonnet, чтобы решать задачи по фото.",
+    "paywallCta": "Купить за 99 ₽"
+  },
+  "models": {
+    "free": "Бесплатно",
+    "premium": "Premium",
+    "vision": "Зрение",
+    "selectModel": "Выбрать модель"
+  },
+  "auth": {
+    "loginTitle": "Войдите за 1 клик",
+    "loginSubtitle": "Без email и паролей. Подключите аккаунт и приступайте.",
+    "googleCta": "Продолжить с Google",
+    "telegramCta": "Войти через Telegram",
+    "noEmailNeeded": "Никаких форм. Никакого спама.",
+    "telegramHint": "Используйте Telegram для входа на телефоне",
+    "agreeTerms": "Продолжая, вы соглашаетесь с {terms} и {privacy}.",
+    "termsLabel": "офертой",
+    "privacyLabel": "политикой конфиденциальности"
+  },
+  "referral": {
+    "title": "Пригласи друга",
+    "subtitle": "Получите по 10 000 PRO-токенов за каждого друга, который оформит первую покупку.",
+    "copyLink": "Скопировать ссылку",
+    "copied": "Скопировано!",
+    "invitedCount": "приглашено: {count}",
+    "earned": "получено токенов: {count}"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Что-то пошло не так",
+    "retry": "Повторить",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "close": "Закрыть"
+  },
+  "landing": {
+    "heroTitle": "Все топовые ИИ — в одном окне",
+    "heroSubtitle": "GPT, Claude, Vibeneura без VPN и без лимитов. Платите только за то, что используете.",
+    "ctaPrimary": "Начать бесплатно",
+    "ctaSecondary": "Узнать больше",
+    "feature1Title": "Без VPN",
+    "feature1Desc": "Все запросы идут через наш сервер. Полный доступ из любой точки мира.",
+    "feature2Title": "Все модели",
+    "feature2Desc": "GPT 5.4, Claude Opus 4.6, VibeneuraAI — переключайтесь одним кликом.",
+    "feature3Title": "Прозрачная оплата",
+    "feature3Desc": "Купите токены или подпишитесь на Premium. Никаких скрытых платежей."
+  }
+}

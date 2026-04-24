@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark theme (default) */
+:root,
+.dark {
+  color-scheme: dark;
+  --color-background: #0d1514;
+  --color-surface: #161d1c;
+  --color-surface-variant: #1e2625;
+  --color-on-surface: #dce4e2;
+  --color-on-surface-variant: #849491;
+  --color-primary: #7bffee;
+  --color-on-primary: #0d1514;
+  --color-secondary: #ddb7ff;
+  --color-tertiary: #d0fa00;
+  --color-error: #ff6b6b;
+}
+
+/* Light theme */
+.light {
+  color-scheme: light;
+  --color-background: #f5f7f6;
+  --color-surface: #ffffff;
+  --color-surface-variant: #e8edec;
+  --color-on-surface: #1a2423;
+  --color-on-surface-variant: #5a6664;
+  --color-primary: #00a896;
+  --color-on-primary: #ffffff;
+  --color-secondary: #8b5cf6;
+  --color-tertiary: #84cc16;
+  --color-error: #dc2626;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(28, 222, 204, 0.18), transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, rgba(111, 0, 190, 0.18), transparent 65%),
+    radial-gradient(800px 500px at 50% 110%, rgba(208, 250, 0, 0.08), transparent 60%);
+  background-attachment: fixed;
+}
+
+.light body {
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(0, 168, 150, 0.08), transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, rgba(139, 92, 246, 0.08), transparent 65%),
+    radial-gradient(800px 500px at 50% 110%, rgba(132, 204, 22, 0.05), transparent 60%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .glass {
+    background-color: rgba(22, 29, 28, 0.55);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 1px 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 20px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+
+  .light .glass {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow:
+      inset 1px 1px 0 0 rgba(255, 255, 255, 0.5),
+      0 20px 60px -20px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-strong {
+    background-color: rgba(13, 21, 20, 0.7);
+    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .light .glass-strong {
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .bloom {
+    position: relative;
+  }
+
+  .bloom::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #7bffee, #ddb7ff);
+    filter: blur(14px);
+    opacity: 0.35;
+    z-index: -1;
+    transition: opacity 200ms ease;
+  }
+
+  .light .bloom::before {
+    background: linear-gradient(135deg, #00a896, #8b5cf6);
+    opacity: 0.25;
+  }
+
+  .bloom:hover::before {
+    opacity: 0.55;
+  }
+
+  .light .bloom:hover::before {
+    opacity: 0.4;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #7bffee 0%, #ddb7ff 60%, #d0fa00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .light .text-gradient {
+    background: linear-gradient(135deg, #00a896 0%, #8b5cf6 60%, #84cc16 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(132, 148, 145, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(132, 148, 145, 0.45);
+}
+
+/* Liquid loader */
+@keyframes liquid {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-4px) scale(1.1); opacity: 1; }
+}
+
+.liquid-dot {
+  animation: liquid 1.4s ease-in-out infinite;
+}

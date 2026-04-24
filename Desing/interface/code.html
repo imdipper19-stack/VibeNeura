@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>High-Fidelity UI/UX Showcase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#4d5e00",
+                        "surface-container": "#1a2120",
+                        "on-primary-fixed": "#00201d",
+                        "secondary": "#ddb7ff",
+                        "surface-container-low": "#161d1c",
+                        "on-primary": "#003732",
+                        "surface-dim": "#0d1514",
+                        "on-surface": "#dce4e2",
+                        "secondary-container": "#6f00be",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#51fbe8",
+                        "on-tertiary-fixed-variant": "#3e4c00",
+                        "surface-container-lowest": "#08100e",
+                        "tertiary": "#d0fa00",
+                        "on-surface-variant": "#bacac6",
+                        "primary-container": "#2ee5d3",
+                        "surface-container-highest": "#2f3635",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "inverse-primary": "#006a61",
+                        "outline-variant": "#3b4a47",
+                        "background": "#0d1514",
+                        "surface-tint": "#1cdecc",
+                        "primary": "#7bffee",
+                        "on-secondary-fixed": "#2c0051",
+                        "tertiary-container": "#b7dc00",
+                        "on-error": "#690005",
+                        "on-secondary": "#490080",
+                        "inverse-on-surface": "#2a3230",
+                        "outline": "#849491",
+                        "surface": "#0d1514",
+                        "primary-fixed-dim": "#1cdecc",
+                        "on-tertiary-fixed": "#171e00",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "surface-container-high": "#242b2a",
+                        "secondary-fixed": "#f0dbff",
+                        "inverse-surface": "#dce4e2",
+                        "surface-variant": "#2f3635",
+                        "on-primary-container": "#00625a",
+                        "surface-bright": "#333b39",
+                        "on-tertiary": "#2a3400",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#caf300",
+                        "tertiary-fixed-dim": "#b0d500",
+                        "on-secondary-container": "#d6a9ff",
+                        "on-primary-fixed-variant": "#005049",
+                        "on-background": "#dce4e2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "24px",
+                        "stack-sm": "4px",
+                        "stack-md": "12px",
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "container-padding": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Space Grotesk"],
+                        "display-xl": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "display-xl": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0d1514;
+            color: #dce4e2;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bloom-active {
+            box-shadow: 0 0 20px rgba(46, 229, 211, 0.2);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex font-body-md text-body-md text-on-background">
+<!-- Desktop Canvas (60%) -->
+<div class="w-[60%] h-full relative flex bg-background">
+<!-- SideNav (JSON Config) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 z-40 p-4 bg-slate-900/40 backdrop-blur-2xl h-full w-72 border-r border-white/10 shadow-2xl">
+<div class="mb-8">
+<button class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-primary-container to-secondary-container text-white font-label-sm text-label-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Chat
+                </button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<div class="space-y-1 font-['Space_Grotesk'] text-sm">
+<div class="text-on-surface-variant font-label-sm text-label-sm mb-4 uppercase tracking-widest pl-3">Recent</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-gradient-to-r from-[#2EE5D3]/20 to-transparent border-l-2 border-[#2EE5D3] text-white group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary-container">chat_bubble</span>
+<span>Recent Chat 1</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span>Recent Chat 2</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+<span>Recent Chat 3</span>
+</a>
+</div>
+<div class="mt-8 space-y-1 font-['Space_Grotesk'] text-sm">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+<span>Workspace</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">insights</span>
+<span>Analytics</span>
+</a>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-white/10 font-['Space_Grotesk'] text-sm">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 group hover:bg-white/5 hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">help_outline</span>
+<span>Help</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3 py-2 bg-surface-container-high rounded-lg">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-white font-label-sm text-label-sm">AR</div>
+<div class="flex-1">
+<div class="text-on-surface font-body-md text-[14px]">AI Researcher</div>
+<div class="text-primary-container font-label-sm text-[10px]">Pro Plan</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-72 relative flex flex-col h-full bg-surface-dim">
+<!-- Top App Bar (JSON Config Context) -->
+<header class="flex justify-between items-center px-6 h-16 w-full fixed top-0 z-50 bg-slate-900/50 backdrop-blur-xl docked full-width border-b border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+<div class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#2EE5D3] to-purple-400 font-['Space_Grotesk'] tracking-tight">
+                    Neural Network
+                </div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-white/10">
+<span class="text-[#2EE5D3] font-semibold font-['Space_Grotesk'] tracking-tight text-sm">Claude Sonnet 4.5</span>
+<span class="material-symbols-outlined text-[16px] text-primary-container">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-[#2EE5D3]">
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Chat Canvas -->
+<div class="flex-1 overflow-y-auto pt-24 pb-32 px-container-padding flex justify-center">
+<div class="max-w-3xl w-full space-y-8">
+<!-- User Message -->
+<div class="flex justify-end">
+<div class="bg-surface-container-high rounded-2xl rounded-tr-sm px-6 py-4 max-w-[80%] glass-panel">
+<p class="text-on-surface">Analyze the Q3 market trends for decentralized AI platforms, focusing on adoption rates vs. computational cost.</p>
+</div>
+</div>
+<!-- AI Response -->
+<div class="flex justify-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0 border border-primary-container/30">
+<span class="material-symbols-outlined text-primary-container text-[16px]">smart_toy</span>
+</div>
+<div class="space-y-4 max-w-[85%]">
+<p class="text-on-surface">Based on the Q3 dataset, we observe a significant divergence between adoption metrics and raw computational expenditure.</p>
+<!-- High-fidelity Data Visualization Mock -->
+<div class="glass-panel rounded-xl p-6 space-y-4">
+<h4 class="font-headline-md text-headline-md text-on-surface">Adoption vs Cost (Q3)</h4>
+<div class="h-40 flex items-end gap-2">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-[30%] relative group"><div class="absolute inset-0 bg-primary-container/20 rounded-t-sm"></div></div>
+<div class="w-full bg-surface-container-highest rounded-t-sm h-[45%] relative group"><div class="absolute inset-0 bg-primary-container/40 rounded-t-sm"></div></div>
+<div class="w-full bg-surface-container-highest rounded-t-sm h-[60%] relative group"><div class="absolute inset-0 bg-primary-container/60 rounded-t-sm"></div></div>
+<div class="w-full bg-surface-container-highest rounded-t-sm h-[85%] relative group"><div class="absolute inset-0 bg-primary-container/80 rounded-t-sm bloom-active"></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-background via-background/80 to-transparent flex justify-center">
+<div class="max-w-3xl w-full">
+<div class="glass-panel rounded-full p-2 flex items-center gap-2 focus-within:bloom-active transition-all duration-300">
+<button class="p-3 text-on-surface-variant hover:text-primary-container transition-colors rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-3 text-primary-container transition-colors rounded-full bg-primary-container/10">
+<span class="material-symbols-outlined" data-weight="fill">public</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:ring-0 text-body-lg font-body-lg px-2" placeholder="Message Claude..." type="text"/>
+<button class="p-3 bg-primary-container text-on-primary rounded-full hover:opacity-90 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">arrow_upward</span>
+</button>
+</div>
+<div class="text-center mt-2 text-label-sm font-label-sm text-on-surface-variant">
+                        Claude can make mistakes. Consider verifying important information.
+                    </div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Showcase (40%) -->
+<div class="w-[40%] h-full bg-surface flex items-center justify-center p-8 border-l border-white/5">
+<!-- Device Mockup -->
+<div class="w-[375px] h-[812px] bg-surface-dim rounded-[48px] border-[8px] border-surface-container-high relative overflow-hidden shadow-2xl glass-panel">
+<!-- Mobile Top Bar -->
+<div class="flex justify-between items-center px-4 h-14 bg-slate-900/50 backdrop-blur-xl border-b border-white/10 z-10 relative">
+<button class="text-on-surface p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#2EE5D3] to-purple-400 font-['Space_Grotesk'] tracking-tight">
+                    Neural Network
+                </div>
+<button class="text-on-surface p-2">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Mobile Model Selector -->
+<div class="px-4 py-2 border-b border-white/5 flex justify-center z-10 relative bg-surface-dim">
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high border border-white/10 text-xs">
+<span class="text-[#2EE5D3] font-semibold font-['Space_Grotesk']">Claude Sonnet 4.5</span>
+<span class="material-symbols-outlined text-[14px] text-primary-container">expand_more</span>
+</div>
+</div>
+<!-- Mobile Chat Canvas -->
+<div class="p-4 space-y-6 h-[calc(100%-140px)] overflow-y-auto pb-24">
+<!-- Mobile User Message -->
+<div class="flex justify-end">
+<div class="bg-surface-container-high rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] glass-panel text-sm">
+<p class="text-on-surface">Analyze the Q3 market trends for decentralized AI platforms.</p>
+</div>
+</div>
+<!-- Mobile AI Response -->
+<div class="flex justify-start gap-3">
+<div class="w-6 h-6 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0 border border-primary-container/30 mt-1">
+<span class="material-symbols-outlined text-primary-container text-[12px]">smart_toy</span>
+</div>
+<div class="space-y-3 max-w-[85%] text-sm">
+<p class="text-on-surface">Based on the Q3 dataset, we observe a significant divergence...</p>
+<!-- Mobile Mini Chart -->
+<div class="glass-panel rounded-lg p-3 space-y-2">
+<div class="text-xs text-on-surface font-headline-md">Adoption (Q3)</div>
+<div class="h-20 flex items-end gap-1">
+<div class="w-full bg-primary-container/20 rounded-t-sm h-[30%]"></div>
+<div class="w-full bg-primary-container/40 rounded-t-sm h-[45%]"></div>
+<div class="w-full bg-primary-container/60 rounded-t-sm h-[60%]"></div>
+<div class="w-full bg-primary-container/80 rounded-t-sm h-[85%] bloom-active"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Input Area -->
+<div class="absolute bottom-0 left-0 w-full p-4 bg-surface-dim border-t border-white/5">
+<div class="glass-panel rounded-full p-1.5 flex items-center gap-1">
+<button class="p-2 text-on-surface-variant hover:text-primary-container rounded-full">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-on-surface placeholder-on-surface-variant focus:ring-0 text-sm px-1" placeholder="Message..." type="text"/>
+<button class="p-2 bg-primary-container text-on-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where docker *)",
+      "Bash(docker --version)",
+      "Bash(docker info *)",
+      "Bash(powershell.exe *)",
+      "Bash(docker builder *)",
+      "Bash(docker compose *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(docker pull *)",
+      "Bash(cd /tmp)",
+      "Bash(rm -rf oferta privacy)",
+      "Bash(mkdir -p oferta privacy)",
+      "Bash(unzip -q \"/c/Users/S6lev/Desktop/AIOmnibus.com/Docum/Oferta vibeneura.docx\" -d oferta)",
+      "Bash(unzip -q \"/c/Users/S6lev/Desktop/AIOmnibus.com/Docum/privacy vibeneura.docx\" -d privacy)",
+      "Bash(docker exec omnichat-app *)",
+      "Bash(curl -s -X POST https://api.claudehub.fun/v1/messages -H 'Content-Type: application/json' -H 'x-api-key: sk-hub-dUZaHHmlL9vFHZjtb6ffE3656ywMi3yk' -H 'anthropic-version: 2023-06-01' -d '{\"model\":\"claude-3-haiku-20240307\",\"max_tokens\":10,\"messages\":[{\"role\":\"user\",\"content\":\"Hi\"}]}')",
+      "Bash(curl -s https://api.claudehub.fun/v1/models -H 'x-api-key: sk-hub-dUZaHHmlL9vFHZjtb6ffE3656ywMi3yk')",
+      "Bash(docker exec omnichat-db *)",
+      "Bash(curl *)",
+      "Bash(xargs grep *)",
+      "Bash(npm run *)",
+      "Bash(npx next *)",
+      "Bash(npm install *)",
+      "Bash(git --version)",
+      "Bash(git config *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

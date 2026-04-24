@@ -1,0 +1,27 @@
+{
+  "name": "vibeneura — Premium AI Aggregator",
+  "short_name": "vibeneura",
+  "description": "Все топовые ИИ — в одном окне. GPT, Claude, Vibeneura без VPN.",
+  "start_url": "/ru/chat",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0E16",
+  "theme_color": "#7BFFEE",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"]
+}
