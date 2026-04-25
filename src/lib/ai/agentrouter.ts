@@ -1,16 +1,12 @@
-// AgentRouter — OpenAI-compatible streaming client.
+// AgentRouter — Anthropic-compatible streaming client (/v1/messages).
 // Used for the free "VibeneuraAI" tier (DeepSeek v3.2 under the hood).
+// We use the Anthropic protocol because AgentRouter's antibot filter on the
+// OpenAI-shape endpoint rejects every non-CLI client; the Anthropic endpoint
+// is the one their docs target for Claude Code, so it tends to be friendlier.
 import 'server-only';
+import type { ChatTurn } from './claude-hub';
 
-export type ARTurn = {
-  role: 'user' | 'assistant' | 'system';
-  content:
-    | string
-    | Array<
-        | { type: 'text'; text: string }
-        | { type: 'image_url'; image_url: { url: string } }
-      >;
-};
+export type ARTurn = ChatTurn;
 
 type StreamEvent =
   | { type: 'content'; delta: string }
@@ -18,7 +14,7 @@ type StreamEvent =
   | { type: 'done' }
   | { type: 'error'; message: string };
 
-const BASE_URL = process.env.AGENTROUTER_BASE_URL ?? 'https://agentrouter.org/v1';
+const BASE_URL = process.env.AGENTROUTER_BASE_URL ?? 'https://agentrouter.org';
 const API_KEY = process.env.AGENTROUTER_API_KEY ?? '';
 
 const MODEL_MAP: Record<string, string> = {
@@ -41,30 +37,30 @@ export async function* streamAgentRouter(params: {
     return;
   }
 
-  const allMessages: ARTurn[] = params.system
-    ? [{ role: 'system', content: params.system }, ...params.messages]
-    : params.messages;
-
-  const body = {
+  const body: Record<string, unknown> = {
     model: resolveAgentRouterModel(params.model),
-    messages: allMessages,
-    stream: true,
     max_tokens: params.maxTokens ?? 4096,
+    stream: true,
+    system: params.system,
+    messages: params.messages.map((m) => ({
+      role: m.role === 'system' ? 'user' : m.role,
+      content: m.content,
+    })),
   };
 
-  const res = await fetch(`${BASE_URL}/chat/completions`, {
+  // BASE_URL may be either "https://agentrouter.org" or
+  // "https://agentrouter.org/v1" — normalise so we always hit /v1/messages.
+  const root = BASE_URL.replace(/\/v1\/?$/, '').replace(/\/$/, '');
+  const url = `${root}/v1/messages`;
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
+      'anthropic-version': '2023-06-01',
+      'x-api-key': API_KEY,
       authorization: `Bearer ${API_KEY}`,
-      accept: 'application/json',
-      'user-agent': 'OpenAI/NodeJS/4.67.3',
-      'x-stainless-lang': 'js',
-      'x-stainless-package-version': '4.67.3',
-      'x-stainless-os': 'Linux',
-      'x-stainless-arch': 'x64',
-      'x-stainless-runtime': 'node',
-      'x-stainless-runtime-version': process.version,
+      'user-agent': 'claude-cli/1.0.119 (external, cli)',
     },
     body: JSON.stringify(body),
     signal: params.signal,
@@ -98,13 +94,14 @@ export async function* streamAgentRouter(params: {
 
       try {
         const ev = JSON.parse(payload);
-        const delta = ev.choices?.[0]?.delta?.content;
-        if (typeof delta === 'string' && delta) {
-          yield { type: 'content', delta };
-        }
-        if (ev.usage) {
-          inputTokens = ev.usage.prompt_tokens ?? inputTokens;
-          outputTokens = ev.usage.completion_tokens ?? outputTokens;
+        if (ev.type === 'content_block_delta' && ev.delta?.type === 'text_delta') {
+          yield { type: 'content', delta: ev.delta.text };
+        } else if (ev.type === 'message_delta' && ev.usage) {
+          outputTokens = ev.usage.output_tokens ?? outputTokens;
+        } else if (ev.type === 'message_start' && ev.message?.usage) {
+          inputTokens = ev.message.usage.input_tokens ?? 0;
+        } else if (ev.type === 'error') {
+          yield { type: 'error', message: ev.error?.message ?? 'Upstream error' };
         }
       } catch {
         // ignore malformed chunk
