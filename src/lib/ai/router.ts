@@ -4,8 +4,9 @@
 import 'server-only';
 import { streamClaudeHub, type ChatTurn } from './claude-hub';
 import { streamOpenRouter, type ORTurn } from './openrouter';
+import { streamAgentRouter, type ARTurn } from './agentrouter';
 
-export type RouteTurn = ChatTurn; // we accept Anthropic-shape blocks; convert for OR.
+export type RouteTurn = ChatTurn; // we accept Anthropic-shape blocks; convert for OR/AR.
 
 type StreamEvent =
   | { type: 'content'; delta: string }
@@ -15,8 +16,10 @@ type StreamEvent =
   | { type: 'error'; message: string };
 
 // Claude Hub handles: anthropic + openai models
-// OpenRouter handles: meta (Llama) only
+// AgentRouter handles: vibeneura free tier (deepseek)
+// OpenRouter handles: legacy / fallback
 const CLAUDEHUB_PROVIDERS = new Set(['anthropic', 'openai']);
+const AGENTROUTER_PROVIDERS = new Set(['agentrouter']);
 const OPENROUTER_PROVIDERS = new Set(['meta', 'openrouter']);
 
 export async function* streamAi(params: {
@@ -33,6 +36,33 @@ export async function* streamAi(params: {
     yield* streamClaudeHub({
       model: params.modelSlug,
       messages: params.messages,
+      system: params.system,
+      maxTokens: params.maxTokens,
+      signal: params.signal,
+    });
+    return;
+  }
+
+  // AgentRouter (DeepSeek v3.2 et al). OpenAI-compatible shape, same conversion as OR.
+  if (AGENTROUTER_PROVIDERS.has(params.provider)) {
+    const arMessages: ARTurn[] = params.messages.map((m) => {
+      if (typeof m.content === 'string') {
+        return { role: m.role, content: m.content };
+      }
+      const blocks = m.content
+        .filter((b) => b.type === 'text' || b.type === 'image')
+        .map((b) => {
+          if (b.type === 'text') return { type: 'text' as const, text: b.text };
+          const img = b as { type: 'image'; source: { media_type: string; data: string } };
+          const url = `data:${img.source.media_type};base64,${img.source.data}`;
+          return { type: 'image_url' as const, image_url: { url } };
+        });
+      return { role: m.role, content: blocks };
+    });
+
+    yield* streamAgentRouter({
+      model: params.modelSlug,
+      messages: arMessages,
       system: params.system,
       maxTokens: params.maxTokens,
       signal: params.signal,

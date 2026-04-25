@@ -62,7 +62,7 @@ const MODELS = [
   {
     slug: 'vibeneura-ai',
     displayName: 'VibeneuraAI',
-    provider: 'openrouter',
+    provider: 'agentrouter',
     description: 'Бесплатная мультимодальная модель Vibeneura — текст, картинки, длинный контекст.',
     tier: PlanTier.FREE,
     supportsVision: true,

@@ -44,6 +44,8 @@ services:
       ANTHROPIC_AUTH_TOKEN: sk-hub-dUZaHHmlL9vFHZjtb6ffE3656ywMi3yk
       OPENROUTER_API_KEY: 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
       OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+      AGENTROUTER_BASE_URL: https://agentrouter.org/v1
+      AGENTROUTER_API_KEY: sk-ZcXKAmKQACIBIa6CrVjhxuaFnVd2Je7VgNB4zlaE4sZAoNN6
       NEXTAUTH_SECRET: PPm5pLwu6AnmnM9JqU+4FwxQpSuSIqhyPXdDd3lE9Qk=
       NEXTAUTH_URL: https://vibeneura.online
       AUTH_SECRET: PPm5pLwu6AnmnM9JqU+4FwxQpSuSIqhyPXdDd3lE9Qk=

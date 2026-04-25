@@ -50,7 +50,7 @@ export const FALLBACK_MODELS: ModelMeta[] = [
   {
     slug: 'vibeneura-ai',
     displayName: 'VibeneuraAI',
-    provider: 'openrouter',
+    provider: 'agentrouter',
     description: 'Бесплатная мультимодальная модель Vibeneura — текст, картинки, длинный контекст.',
     tier: 'FREE',
     supportsVision: true,
