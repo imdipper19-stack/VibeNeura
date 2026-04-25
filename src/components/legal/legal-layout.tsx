@@ -42,7 +42,7 @@ export function LegalLayout({
       </article>
 
       <footer className="border-t border-white/5 py-8 text-center text-sm text-on-surface-variant">
-        © {new Date().getFullYear()} vibeneura.pro · ОсОО «Глобал Бридж»
+        © {new Date().getFullYear()} vibeneura.online · ОсОО «Глобал Бридж»
       </footer>
     </main>
   );

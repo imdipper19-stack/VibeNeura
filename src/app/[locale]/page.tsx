@@ -98,7 +98,7 @@ export default async function LandingPage({
 
       <footer className="border-t border-white/5 py-8 text-center text-sm text-on-surface-variant">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-6 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} vibeneura.pro · ОсОО «Глобал Бридж»</span>
+          <span>© {new Date().getFullYear()} vibeneura.online · ОсОО «Глобал Бридж»</span>
           <div className="flex gap-5">
             <Link href={`/${locale}/terms`} className="hover:text-on-surface">
               Оферта

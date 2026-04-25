@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const GLOBAL_SYSTEM = `Ты — vibeneura, умный AI-ассистент встроенный в платформу vibeneura.pro.
+  const GLOBAL_SYSTEM = `Ты — vibeneura, умный AI-ассистент встроенный в платформу vibeneura.online.
 
 Правила:
 - Помогай с любыми задачами: код, анализ, перевод, мозговой штурм, решение задач

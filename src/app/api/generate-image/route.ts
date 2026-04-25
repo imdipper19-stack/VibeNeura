@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.pro',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online',
         'X-Title': 'vibeneura',
       },
       body: JSON.stringify({

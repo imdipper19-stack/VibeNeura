@@ -23,7 +23,7 @@ export function ReferralBanner() {
 
   if (status !== 'authenticated' || !data) return null;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.pro';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online';
   const link = `${appUrl}/?ref=${data.code}`;
 
   const copy = async () => {

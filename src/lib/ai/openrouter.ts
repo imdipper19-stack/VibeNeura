@@ -81,7 +81,7 @@ export async function* streamOpenRouter(params: {
     headers: {
       'content-type': 'application/json',
       authorization: `Bearer ${API_KEY}`,
-      'http-referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.pro',
+      'http-referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online',
       'x-title': 'vibeneura',
     },
     body: JSON.stringify(body),
