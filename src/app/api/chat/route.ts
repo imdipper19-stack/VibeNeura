@@ -8,7 +8,7 @@ import { MessageRole, TransactionStatus, TransactionType } from '@prisma/client'
 import { FALLBACK_MODELS } from '@/lib/ai/models';
 import { checkAndConsumeDailyLimit } from '@/lib/billing/daily-limit';
 import { searchWeb, formatSearchResultsForContext } from '@/lib/ai/web-search';
-import { parseDocx } from '@/lib/documents/parse';
+import { parseDocx, parsePdf, parsePptx } from '@/lib/documents/parse';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,7 +49,23 @@ function isDocxAttachment(a: { name: string; mimeType: string; dataUrl?: string 
   return /\.docx$/i.test(a.name);
 }
 
-async function injectDocxContent(
+function isPdfAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  if (a.mimeType === 'application/pdf') return true;
+  return /\.pdf$/i.test(a.name);
+}
+
+function isPptxAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  if (
+    a.mimeType ===
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  )
+    return true;
+  return /\.pptx$/i.test(a.name);
+}
+
+async function injectDocContent(
   messages: z.infer<typeof MessageSchema>[],
 ): Promise<z.infer<typeof MessageSchema>[]> {
   const out: z.infer<typeof MessageSchema>[] = [];
@@ -58,25 +74,32 @@ async function injectDocxContent(
       out.push(m);
       continue;
     }
-    const docxParts: string[] = [];
+    const docParts: string[] = [];
     for (const a of m.attachments) {
-      if (!isDocxAttachment(a)) continue;
-      const parsed = await parseDocx(a.dataUrl!);
+      let parsed: { markdown: string; truncated: boolean } | null = null;
+      if (isDocxAttachment(a)) {
+        parsed = await parseDocx(a.dataUrl!);
+      } else if (isPdfAttachment(a)) {
+        parsed = await parsePdf(a.dataUrl!);
+      } else if (isPptxAttachment(a)) {
+        parsed = await parsePptx(a.dataUrl!);
+      }
+      if (!parsed) continue;
       const note = parsed.truncated
         ? '\n[Документ был обрезан, чтобы поместиться в контекст.]'
         : '';
       const body = parsed.markdown || '[Не удалось извлечь текст из документа]';
-      docxParts.push(
+      docParts.push(
         `[Прикреплён файл: ${a.name}]\n${body}${note}\n[/Прикреплён файл]`,
       );
     }
-    if (docxParts.length === 0) {
+    if (docParts.length === 0) {
       out.push(m);
       continue;
     }
     const combined = m.content
-      ? `${m.content}\n\n${docxParts.join('\n\n')}`
-      : docxParts.join('\n\n');
+      ? `${m.content}\n\n${docParts.join('\n\n')}`
+      : docParts.join('\n\n');
     out.push({ ...m, content: combined });
   }
   return out;
@@ -151,11 +174,12 @@ export async function POST(req: NextRequest) {
 - Используй Markdown: заголовки, списки, code-блоки, таблицы
 - Будь конкретным и полезным`;
 
-  const messagesWithDocs = await injectDocxContent(parsed.messages);
+  const messagesWithDocs = await injectDocContent(parsed.messages);
   const { system: baseSystem, turns } = buildTurns(messagesWithDocs, parsed.supportsVision ?? false);
 
   // Web search integration
   let system = baseSystem ? `${GLOBAL_SYSTEM}\n\n${baseSystem}` : GLOBAL_SYSTEM;
+  let searchSources: { title: string; url: string }[] = [];
   if (parsed.webSearch) {
     const lastUserMessage = parsed.messages.filter(m => m.role === 'USER').pop();
     if (lastUserMessage?.content) {
@@ -164,6 +188,7 @@ export async function POST(req: NextRequest) {
         if (searchResults.length > 0) {
           const searchContext = formatSearchResultsForContext(searchResults);
           system = system ? `${system}\n\n${searchContext}` : searchContext;
+          searchSources = searchResults.map((r) => ({ title: r.title, url: r.url }));
         }
       } catch (e) {
         console.error('Web search failed:', e);
@@ -260,6 +285,12 @@ export async function POST(req: NextRequest) {
       }
 
       try {
+        // Send thinking indicator before streaming starts
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ type: 'thinking', status: 'start' })}\n\n`),
+        );
+
+        let thinkingDone = false;
         for await (const ev of streamAi({
           modelSlug: parsed.model,
           provider: modelProvider,
@@ -268,13 +299,27 @@ export async function POST(req: NextRequest) {
           signal: req.signal,
         })) {
           if (ev.type === 'content') {
+            if (!thinkingDone) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: 'thinking', status: 'done' })}\n\n`),
+              );
+              thinkingDone = true;
+            }
             assistantContent += ev.delta;
           } else if (ev.type === 'usage') {
             inTok = ev.inputTokens;
             outTok = ev.outputTokens;
           }
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(ev)}\n\n`));
-          if (ev.type === 'done' || ev.type === 'error') break;
+          if (ev.type === 'done') {
+            if (searchSources.length > 0) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: 'sources', sources: searchSources })}\n\n`),
+              );
+            }
+            break;
+          }
+          if (ev.type === 'error') break;
         }
       } catch (err: any) {
         controller.enqueue(

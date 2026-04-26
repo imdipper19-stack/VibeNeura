@@ -1,18 +1,16 @@
 'use client';
 
+import { useState, memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Copy, RotateCcw, Sparkles, User } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Copy, RotateCcw, Sparkles, User, ChevronDown, ChevronRight, Globe, Check, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
 import type { ChatMessage } from '@/store/chat-store';
 import { DocumentAttachment } from '@/components/chat/document-attachment';
 
 type ExtractedDoc = { filename: string; markdown: string; ready: boolean };
 
-// Вытаскиваем все <vn-doc filename="...">...</vn-doc> из текста ассистента.
-// Поддерживаем стримящееся состояние: незакрытый тег → ready=false, скрываем
-// сырой markdown пока тег не закрылся.
 function extractDocBlocks(content: string): { cleanText: string; docs: ExtractedDoc[] } {
   const docs: ExtractedDoc[] = [];
   let cleanText = content;
@@ -33,11 +31,13 @@ function extractDocBlocks(content: string): { cleanText: string; docs: Extracted
   return { cleanText: cleanText.trim(), docs };
 }
 
-export function MessageBubble({ message }: { message: ChatMessage }) {
+export const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'USER';
   const { cleanText, docs } = isUser
     ? { cleanText: message.content, docs: [] as ExtractedDoc[] }
     : extractDocBlocks(message.content);
+
+  const isStreaming = !isUser && !message.done && message.content.length > 0;
 
   return (
     <motion.div
@@ -92,11 +92,33 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
               )}
             </div>
           )}
+
+          {/* Thinking indicator */}
+          {!isUser && message.thinking && (
+            <ThinkingBlock />
+          )}
+
           <div className="prose prose-sm dark:prose-invert max-w-none prose-pre:my-2 prose-pre:bg-black/10 dark:prose-pre:bg-surface-container-lowest prose-pre:rounded-md prose-code:text-primary">
             {cleanText ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanText}</ReactMarkdown>
-            ) : !docs.length ? (
-              <ThinkingIndicator />
+              isStreaming ? (
+                <PlainTextStream text={cleanText} />
+              ) : (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    pre: ({ children, ...props }) => (
+                      <div className="relative group/code">
+                        <pre {...props}>{children}</pre>
+                        <CopyCodeButton content={extractCodeText(children)} />
+                      </div>
+                    ),
+                  }}
+                >
+                  {cleanText}
+                </ReactMarkdown>
+              )
+            ) : !docs.length && !message.thinking ? (
+              <ThinkingDots />
             ) : null}
           </div>
           {docs.map((d, i) => (
@@ -108,6 +130,11 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
             />
           ))}
         </div>
+
+        {/* Sources block */}
+        {!isUser && message.sources && message.sources.length > 0 && (
+          <SourcesBlock sources={message.sources} />
+        )}
 
         {!isUser && message.content && (
           <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
@@ -124,6 +151,105 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
         )}
       </div>
     </motion.div>
+  );
+});
+
+function PlainTextStream({ text }: { text: string }) {
+  return <div className="whitespace-pre-wrap">{text}</div>;
+}
+
+function extractCodeText(children: React.ReactNode): string {
+  if (!children) return '';
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) return children.map(extractCodeText).join('');
+  if (typeof children === 'object' && 'props' in (children as any)) {
+    return extractCodeText((children as any).props?.children);
+  }
+  return '';
+}
+
+function CopyCodeButton({ content }: { content: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-md bg-white/5 text-on-surface-variant opacity-0 transition-all hover:bg-white/10 hover:text-on-surface group-hover/code:opacity-100"
+      aria-label="Copy code"
+    >
+      {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
+    </button>
+  );
+}
+
+function ThinkingBlock() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setExpanded((v) => !v)}
+      className="mb-2 flex w-full items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2 text-left text-xs text-primary transition-colors hover:bg-primary/10"
+    >
+      <div className="flex items-center gap-1.5">
+        <span className="thinking-dot h-1.5 w-1.5 rounded-full bg-primary" style={{ animationDelay: '0ms' }} />
+        <span className="thinking-dot h-1.5 w-1.5 rounded-full bg-primary" style={{ animationDelay: '200ms' }} />
+        <span className="thinking-dot h-1.5 w-1.5 rounded-full bg-primary" style={{ animationDelay: '400ms' }} />
+      </div>
+      <span className="font-medium">Анализирую запрос...</span>
+      {expanded ? <ChevronDown className="ml-auto h-3 w-3" /> : <ChevronRight className="ml-auto h-3 w-3" />}
+    </button>
+  );
+}
+
+function SourcesBlock({ sources }: { sources: Array<{ title: string; url: string }> }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="glass rounded-xl border border-white/5 px-3 py-2">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center gap-2 text-xs text-on-surface-variant"
+      >
+        <Globe className="h-3.5 w-3.5 text-primary" />
+        <span className="font-medium">Источники ({sources.length})</span>
+        {expanded ? <ChevronDown className="ml-auto h-3 w-3" /> : <ChevronRight className="ml-auto h-3 w-3" />}
+      </button>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <ul className="mt-2 space-y-1">
+              {sources.map((s, i) => (
+                <li key={i}>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-primary hover:bg-primary/5 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{s.title || s.url}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -147,7 +273,7 @@ function IconBtn({
   );
 }
 
-function ThinkingIndicator() {
+function ThinkingDots() {
   return (
     <div className="flex items-center gap-1.5 py-1">
       <span className="liquid-dot h-2 w-2 rounded-full bg-primary/70" style={{ animationDelay: '0ms' }} />

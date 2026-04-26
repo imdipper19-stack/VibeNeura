@@ -4,9 +4,8 @@
 import 'server-only';
 import { streamClaudeHub, type ChatTurn } from './claude-hub';
 import { streamOpenRouter, type ORTurn } from './openrouter';
-import { streamAgentRouter } from './agentrouter';
 
-export type RouteTurn = ChatTurn; // we accept Anthropic-shape blocks; convert for OR/AR.
+export type RouteTurn = ChatTurn;
 
 type StreamEvent =
   | { type: 'content'; delta: string }
@@ -15,12 +14,7 @@ type StreamEvent =
   | { type: 'done' }
   | { type: 'error'; message: string };
 
-// Claude Hub handles: anthropic + openai models
-// AgentRouter handles: vibeneura free tier (deepseek)
-// OpenRouter handles: legacy / fallback
 const CLAUDEHUB_PROVIDERS = new Set(['anthropic', 'openai']);
-const AGENTROUTER_PROVIDERS = new Set(['agentrouter']);
-const OPENROUTER_PROVIDERS = new Set(['meta', 'openrouter']);
 
 export async function* streamAi(params: {
   modelSlug: string;
@@ -34,18 +28,6 @@ export async function* streamAi(params: {
   // OpenRouter: meta (Llama) only
   if (CLAUDEHUB_PROVIDERS.has(params.provider)) {
     yield* streamClaudeHub({
-      model: params.modelSlug,
-      messages: params.messages,
-      system: params.system,
-      maxTokens: params.maxTokens,
-      signal: params.signal,
-    });
-    return;
-  }
-
-  // AgentRouter speaks the Anthropic /v1/messages protocol — pass messages as-is.
-  if (AGENTROUTER_PROVIDERS.has(params.provider)) {
-    yield* streamAgentRouter({
       model: params.modelSlug,
       messages: params.messages,
       system: params.system,

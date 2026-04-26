@@ -51,7 +51,7 @@ export default async function LandingPage({
           No VPN · No limits · All models
         </div>
 
-        <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-gradient">
+        <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-gradient drop-shadow-[0_0_30px_rgba(0,251,251,0.3)]">
           {t('heroTitle')}
         </h1>
 
@@ -60,7 +60,7 @@ export default async function LandingPage({
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link href={`/${locale}/chat`}>
+          <Link href={`/${locale}/login`}>
             <Button size="lg" className="bloom group">
               {t('ctaPrimary')}
               <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -130,7 +130,7 @@ function FeatureCard({
     tertiary: 'bg-tertiary/15 text-tertiary',
   };
   return (
-    <div className="glass group relative overflow-hidden rounded-2xl p-8 transition-all hover:-translate-y-1 hover:border-white/15">
+    <div className="glass glow-border group relative overflow-hidden rounded-2xl p-8 transition-all hover:-translate-y-1 hover:border-white/15">
       <div
         className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-lg ${accentMap[accent]}`}
       >

@@ -44,12 +44,6 @@ export default async function LoginPage({
           <ShieldCheck className="h-3.5 w-3.5 text-tertiary" />
           <span>{t('noEmailNeeded')}</span>
         </div>
-
-        <div className="mt-6 text-center text-xs text-on-surface-variant">
-          <Link href={`/${locale}/chat`} className="text-primary hover:underline">
-            Continue as guest →
-          </Link>
-        </div>
       </Card>
     </div>
   );

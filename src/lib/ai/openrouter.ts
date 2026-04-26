@@ -23,17 +23,15 @@ const API_KEY = process.env.OPENROUTER_API_KEY ?? '';
 
 // Map our internal slug → exact OpenRouter model identifier.
 const MODEL_MAP: Record<string, string> = {
-  'vibeneura-ai': 'google/gemma-3-27b-it:free',
+  'vibeneura-ai': 'deepseek/deepseek-chat-v3-0324:free',
   'gpt-5.4': 'openai/gpt-4o',
 };
 
-// Fallback цепочки: если основная модель/провайдер лежит — OpenRouter переключится на следующую.
-// Лимит OpenRouter: не более 3 моделей в массиве.
 const FALLBACK_MODELS: Record<string, string[]> = {
-  'google/gemma-3-27b-it:free': [
+  'deepseek/deepseek-chat-v3-0324:free': [
+    'deepseek/deepseek-chat-v3-0324:free',
+    'qwen/qwen3-235b-a22b:free',
     'google/gemma-3-27b-it:free',
-    'nvidia/nemotron-nano-12b-v2-vl:free',
-    'qwen/qwen3-next-80b-a3b-instruct:free',
   ],
 };
 
