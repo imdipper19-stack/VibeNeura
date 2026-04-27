@@ -5,6 +5,7 @@ import { locales, type Locale } from '@/i18n/config';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { HelpWidget } from '@/components/chat/help-widget';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -27,7 +28,10 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ThemeProvider>
         <AuthProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            <HelpWidget />
+          </QueryProvider>
         </AuthProvider>
       </ThemeProvider>
     </NextIntlClientProvider>

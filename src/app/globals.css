@@ -6,16 +6,17 @@
 :root,
 .dark {
   color-scheme: dark;
-  --color-background: #0d1514;
-  --color-surface: #161d1c;
-  --color-surface-variant: #1e2625;
-  --color-on-surface: #dce4e2;
-  --color-on-surface-variant: #849491;
-  --color-primary: #7bffee;
-  --color-on-primary: #0d1514;
-  --color-secondary: #ddb7ff;
-  --color-tertiary: #d0fa00;
-  --color-error: #ff6b6b;
+  --color-background: #0d1515;
+  --color-surface: #151d1d;
+  --color-surface-variant: #192121;
+  --color-on-surface: #dbe4e3;
+  --color-on-surface-variant: #b9cac9;
+  --color-primary: #00fbfb;
+  --color-on-primary: #003737;
+  --color-secondary: #b0c6ff;
+  --color-tertiary: #dfb7ff;
+  --color-error: #ffb4ab;
+  --color-coral: #ff6b81;
 }
 
 /* Light theme */
@@ -26,11 +27,12 @@
   --color-surface-variant: #e8edec;
   --color-on-surface: #1a2423;
   --color-on-surface-variant: #5a6664;
-  --color-primary: #00a896;
+  --color-primary: #006a6a;
   --color-on-primary: #ffffff;
-  --color-secondary: #8b5cf6;
-  --color-tertiary: #84cc16;
+  --color-secondary: #00429c;
+  --color-tertiary: #6b00b0;
   --color-error: #dc2626;
+  --color-coral: #e0525e;
 }
 
 html,
@@ -45,17 +47,17 @@ body {
 
 .dark body {
   background-image:
-    radial-gradient(1100px 600px at 12% -10%, rgba(28, 222, 204, 0.18), transparent 60%),
-    radial-gradient(900px 600px at 90% 0%, rgba(111, 0, 190, 0.18), transparent 65%),
-    radial-gradient(800px 500px at 50% 110%, rgba(208, 250, 0, 0.08), transparent 60%);
+    radial-gradient(1100px 600px at 12% -10%, rgba(0, 221, 221, 0.12), transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, rgba(86, 141, 255, 0.12), transparent 65%),
+    radial-gradient(800px 500px at 50% 110%, rgba(223, 183, 255, 0.06), transparent 60%);
   background-attachment: fixed;
 }
 
 .light body {
   background-image:
-    radial-gradient(1100px 600px at 12% -10%, rgba(0, 168, 150, 0.08), transparent 60%),
-    radial-gradient(900px 600px at 90% 0%, rgba(139, 92, 246, 0.08), transparent 65%),
-    radial-gradient(800px 500px at 50% 110%, rgba(132, 204, 22, 0.05), transparent 60%);
+    radial-gradient(1100px 600px at 12% -10%, rgba(0, 106, 106, 0.08), transparent 60%),
+    radial-gradient(900px 600px at 90% 0%, rgba(0, 66, 156, 0.08), transparent 65%),
+    radial-gradient(800px 500px at 50% 110%, rgba(107, 0, 176, 0.05), transparent 60%);
   background-attachment: fixed;
 }
 
@@ -99,7 +101,7 @@ body {
     position: absolute;
     inset: -2px;
     border-radius: inherit;
-    background: linear-gradient(135deg, #7bffee, #ddb7ff);
+    background: linear-gradient(135deg, #00fbfb, #b0c6ff);
     filter: blur(14px);
     opacity: 0.35;
     z-index: -1;
@@ -107,7 +109,7 @@ body {
   }
 
   .light .bloom::before {
-    background: linear-gradient(135deg, #00a896, #8b5cf6);
+    background: linear-gradient(135deg, #006a6a, #00429c);
     opacity: 0.25;
   }
 
@@ -146,14 +148,14 @@ body {
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #7bffee 0%, #ddb7ff 60%, #d0fa00 100%);
+    background: linear-gradient(135deg, #00fbfb 0%, #b0c6ff 50%, #dfb7ff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .light .text-gradient {
-    background: linear-gradient(135deg, #00a896 0%, #8b5cf6 60%, #84cc16 100%);
+    background: linear-gradient(135deg, #006a6a 0%, #00429c 50%, #6b00b0 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -203,4 +205,10 @@ body {
 
 .neural-pulse {
   animation: neural-pulse 3s ease-in-out infinite;
+}
+
+/* Synapse connection lines */
+.synapse-line {
+  background: linear-gradient(90deg, transparent, rgba(0, 251, 251, 0.3), transparent);
+  height: 0.5px;
 }

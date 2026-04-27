@@ -9,7 +9,7 @@ import { ModelSelector, type ModelOption } from '@/components/chat/model-selecto
 import { PaywallModal } from '@/components/billing/paywall-modal';
 import { SystemPromptSettings } from '@/components/chat/system-prompt-settings';
 import { useSettingsStore } from '@/store/settings-store';
-import { Sparkles, Code2, FileText, Languages, Lightbulb, ArrowDown } from 'lucide-react';
+import { Sparkles, Code2, FileText, Languages, Lightbulb, ArrowDown, Search, ImagePlus, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
@@ -232,7 +232,7 @@ export default function ChatPage() {
         <div className="flex justify-center">
           <button
             onClick={scrollToBottom}
-            className="glass -mt-6 mb-1 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-on-surface-variant transition-all hover:border-primary/30 hover:text-primary hover:shadow-[0_0_12px_-2px_rgba(123,255,238,0.4)]"
+            className="glass -mt-6 mb-1 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-[#b9cac9] transition-all hover:border-[#00fbfb]/30 hover:text-[#00fbfb] hover:shadow-[0_0_12px_-2px_rgba(0,251,251,0.4)]"
           >
             <ArrowDown className="h-4 w-4" />
           </button>
@@ -275,26 +275,26 @@ function EmptyState({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bloom mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary"
+        className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#00fbfb] to-[#568dff] shadow-[0_0_40px_-8px_rgba(0,251,251,0.4)]"
       >
-        <Sparkles className="h-8 w-8 text-surface" />
+        <Sparkles className="h-8 w-8 text-[#000510]" />
       </motion.div>
-      <h1 className="font-display text-4xl font-semibold tracking-tight text-gradient">
+      <h1 className="font-display text-4xl font-semibold tracking-tight text-white drop-shadow-[0_0_30px_rgba(0,251,251,0.15)]">
         {t('emptyTitle')}
       </h1>
-      <p className="mt-3 max-w-md text-on-surface-variant">{t('emptySubtitle')}</p>
+      <p className="mt-3 max-w-md text-[#b9cac9]">{t('emptySubtitle')}</p>
 
       <div className="mt-10 grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
         {suggestions.map((s) => (
           <button
             key={s.label}
             onClick={() => onPick(s.prompt)}
-            className="glass glow-border group flex flex-col items-start gap-2 rounded-xl p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/30"
+            className="group flex flex-col items-start gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-left backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[#00fbfb]/30 hover:shadow-[0_0_20px_-4px_rgba(0,251,251,0.15)]"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#00fbfb]/10 text-[#00fbfb]">
               {s.icon}
             </span>
-            <span className="text-sm font-medium leading-tight">{s.label}</span>
+            <span className="text-sm font-medium leading-tight text-[#dbe4e3]">{s.label}</span>
           </button>
         ))}
       </div>

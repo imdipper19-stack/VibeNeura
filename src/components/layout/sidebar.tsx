@@ -11,6 +11,7 @@ import {
   Sparkles,
   LogOut,
   ChevronDown,
+  Mail,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
@@ -146,7 +147,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-sm font-medium text-primary transition-all hover:border-primary hover:shadow-[0_0_16px_-4px_rgba(123,255,238,0.6)]"
+          className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-sm font-medium text-primary transition-all hover:border-primary hover:shadow-[0_0_16px_-4px_rgba(0,251,251,0.6)]"
         >
           <span className="flex items-center gap-2">
             <MessageSquarePlus className="h-4 w-4" />
@@ -235,11 +236,20 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
           <span className="text-xs text-on-surface-variant">{tb('tokens')}</span>
         </div>
         <Link href={`/${locale}/billing`} onClick={onNavigate}>
-          <button className="w-full rounded-md bg-primary/90 px-3 py-2 text-xs font-medium text-on-primary transition-all hover:bg-primary hover:shadow-[0_0_18px_-4px_rgba(123,255,238,0.8)]">
+          <button className="w-full rounded-md bg-primary/90 px-3 py-2 text-xs font-medium text-on-primary transition-all hover:bg-primary hover:shadow-[0_0_18px_-4px_rgba(0,251,251,0.8)]">
             {tb('topup')}
           </button>
         </Link>
       </div>
+
+      {/* Email contact */}
+      <a
+        href="mailto:vibeneura@internet.ru"
+        className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+      >
+        <Mail className="h-3.5 w-3.5" />
+        vibeneura@internet.ru
+      </a>
 
       {/* User menu */}
       <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2">
