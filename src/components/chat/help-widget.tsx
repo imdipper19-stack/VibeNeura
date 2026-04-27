@@ -271,7 +271,7 @@ export function HelpWidget() {
 
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#00fbfb] to-[#568dff] text-[#000510] shadow-[0_0_24px_-4px_rgba(0,251,251,0.5)] transition-all hover:shadow-[0_0_32px_-4px_rgba(0,251,251,0.7)] hover:scale-105"
+        className="fixed bottom-4 right-4 z-50 hidden md:flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#00fbfb] to-[#568dff] text-[#000510] shadow-[0_0_24px_-4px_rgba(0,251,251,0.5)] transition-all hover:shadow-[0_0_32px_-4px_rgba(0,251,251,0.7)] hover:scale-105"
       >
         {open ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
       </button>

@@ -196,13 +196,10 @@ export default function ChatPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="glass-strong z-10 flex items-center justify-between border-b border-white/5 px-6 py-3">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/5 bg-[#0d1514]/90 px-4 py-3 md:px-6 md:backdrop-blur-xl md:bg-[#0d1514]/70">
         <ModelSelector models={models} value={modelSlug} onChange={setModel} />
         <div className="flex items-center gap-2">
           <SystemPromptSettings />
-          <span className="text-xs text-on-surface-variant">
-            {selectedModel?.provider ? `via ${selectedModel.provider}` : ''}
-          </span>
         </div>
       </header>
 
@@ -289,7 +286,7 @@ function EmptyState({
           <button
             key={s.label}
             onClick={() => onPick(s.prompt)}
-            className="group flex flex-col items-start gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-left backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[#00fbfb]/30 hover:shadow-[0_0_20px_-4px_rgba(0,251,251,0.15)]"
+            className="group flex flex-col items-start gap-2 rounded-xl border border-[#00fbfb]/20 bg-white/[0.03] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#00fbfb]/40 hover:bg-[#00fbfb]/[0.05] hover:shadow-[0_0_20px_-4px_rgba(0,251,251,0.2)] active:scale-[0.98]"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#00fbfb]/10 text-[#00fbfb]">
               {s.icon}

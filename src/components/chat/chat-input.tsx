@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useCallback } from 'react';
-import { Paperclip, Globe, ArrowUp, Square, X, Camera, ImageOff, Eye, EyeOff } from 'lucide-react';
+import { Globe, ArrowUp, Square, X, Camera, ImageOff, Eye, EyeOff, Paperclip } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -62,10 +62,9 @@ export function ChatInput({
     }
   };
 
-  const openImagePicker = (kind: 'photo' | 'camera') => {
+  const openCamera = () => {
     if (!supportsVision) return;
-    if (kind === 'camera') cameraRef.current?.click();
-    else fileRef.current?.click();
+    cameraRef.current?.click();
   };
 
   const openFilePicker = () => {
@@ -137,153 +136,132 @@ export function ChatInput({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-r from-primary/20 via-secondary/10 to-tertiary/10 opacity-0 blur-2xl transition-opacity focus-within:opacity-100" />
-
       {/* Drag overlay */}
       {dragOver && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[24px] border-2 border-dashed border-primary bg-primary/10 backdrop-blur-sm">
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-full border-2 border-dashed border-primary bg-primary/10">
           <span className="text-sm font-medium text-primary">Перетащите файлы сюда</span>
         </div>
       )}
 
-      <div className="glass-strong rounded-[24px] border-white/10 p-3 focus-within:border-primary/40 transition-colors">
-        {attachments.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-2">
-            {attachments.map((a) => (
-              <div
-                key={a.id}
-                className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs"
+      {/* Attachments preview */}
+      {attachments.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2 px-1">
+          {attachments.map((a) => (
+            <div
+              key={a.id}
+              className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs"
+            >
+              {a.dataUrl && a.mimeType.startsWith('image/') ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={a.dataUrl} alt={a.name} className="h-8 w-8 rounded object-cover" />
+              ) : (
+                <Paperclip className="h-3 w-3" />
+              )}
+              <span className="max-w-[120px] truncate">{a.name}</span>
+              <button
+                onClick={() => setAttachments((list) => list.filter((x) => x.id !== a.id))}
+                className="opacity-60 hover:opacity-100"
               >
-                {a.dataUrl && a.mimeType.startsWith('image/') ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.dataUrl} alt={a.name} className="h-8 w-8 rounded object-cover" />
-                ) : (
-                  <Paperclip className="h-3 w-3" />
-                )}
-                <span className="max-w-[120px] truncate">{a.name}</span>
-                <button
-                  onClick={() => setAttachments((list) => list.filter((x) => x.id !== a.id))}
-                  className="opacity-60 hover:opacity-100"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
-        <div className="flex items-start gap-2">
-          {/* Mobile camera button — only if model supports vision */}
+      {/* Pill input bar */}
+      <div className="flex items-end gap-2">
+        {/* Camera button — prominent on mobile */}
+        <div className="shrink-0 md:hidden">
           {supportsVision ? (
             <button
               type="button"
-              onClick={() => openImagePicker('camera')}
+              onClick={openCamera}
               aria-label={t('photo')}
-              className="md:hidden relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-surface shadow-[0_0_24px_-6px_rgba(123,255,238,0.9)] active:scale-95 neural-pulse"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#00fbfb] to-[#568dff] text-[#000510] shadow-[0_0_15px_rgba(0,251,251,0.3)] active:scale-95 transition-transform"
             >
-              <Camera className="h-6 w-6" strokeWidth={2.5} />
+              <Camera className="h-5 w-5" strokeWidth={2.5} />
             </button>
           ) : (
             <div
               title="Эта модель не поддерживает изображения"
-              className="md:hidden relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-on-surface-variant/30 cursor-not-allowed"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-on-surface-variant/30 cursor-not-allowed"
             >
-              <ImageOff className="h-6 w-6" />
-            </div>
-          )}
-
-          <textarea
-            ref={taRef}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              autoResize(e.currentTarget);
-            }}
-            onKeyDown={handleKey}
-            placeholder={t('placeholder')}
-            rows={1}
-            className={cn(
-              'w-full resize-none bg-transparent px-2 py-2 text-base outline-none placeholder:text-on-surface-variant/60',
-              preview && hasMarkdown && 'hidden',
-            )}
-          />
-          {preview && hasMarkdown && (
-            <div className="w-full px-2 py-2 text-base prose prose-sm dark:prose-invert max-w-none cursor-text" onClick={() => setPreview(false)}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+              <ImageOff className="h-5 w-5" />
             </div>
           )}
         </div>
 
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1">
-            <IconToggle onClick={openFilePicker} label={t('attach')}>
+        {/* Main pill */}
+        <div className="flex min-h-[48px] flex-1 items-end rounded-full border border-white/10 bg-[#0d1514]/90 px-3 py-1.5 transition-colors focus-within:border-[#00fbfb]/40">
+          {/* Desktop-only toolbar icons */}
+          <div className="hidden md:flex items-center gap-0.5 pb-1 mr-1">
+            <IconBtn onClick={openFilePicker} label={t('attach')}>
               <Paperclip className="h-4 w-4" />
-            </IconToggle>
-            {/* Desktop camera/photo — disabled if no vision */}
-            <IconToggle
-              onClick={() => openImagePicker('camera')}
+            </IconBtn>
+            <IconBtn
+              onClick={openCamera}
               label={supportsVision ? t('photo') : 'Модель не поддерживает изображения'}
               disabled={!supportsVision}
             >
-              {supportsVision ? (
-                <Camera className="h-4 w-4" />
-              ) : (
-                <ImageOff className="h-4 w-4" />
-              )}
-            </IconToggle>
+              {supportsVision ? <Camera className="h-4 w-4" /> : <ImageOff className="h-4 w-4" />}
+            </IconBtn>
+            <IconBtn active={webSearch} onClick={() => setWebSearch((v) => !v)} label={t('webSearch')}>
+              <Globe className="h-4 w-4" />
+            </IconBtn>
+            {hasMarkdown && (
+              <IconBtn active={preview} onClick={() => setPreview((v) => !v)} label="Markdown preview">
+                {preview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </IconBtn>
+            )}
+          </div>
+
+          {/* Textarea */}
+          <div className="flex-1 min-w-0">
+            {preview && hasMarkdown ? (
+              <div className="w-full px-1 py-2 text-base prose prose-sm dark:prose-invert max-w-none cursor-text" onClick={() => setPreview(false)}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+              </div>
+            ) : (
+              <textarea
+                ref={taRef}
+                value={value}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  autoResize(e.currentTarget);
+                }}
+                onKeyDown={handleKey}
+                placeholder={t('placeholder')}
+                rows={1}
+                className="w-full resize-none bg-transparent px-1 py-2 text-base outline-none placeholder:text-on-surface-variant/60"
+              />
+            )}
+          </div>
+
+          {/* Mobile inline icons */}
+          <div className="flex md:hidden items-center gap-0.5 pb-1">
+            <IconBtn onClick={openFilePicker} label={t('attach')}>
+              <Paperclip className="h-4 w-4" />
+            </IconBtn>
+            <IconBtn active={webSearch} onClick={() => setWebSearch((v) => !v)} label={t('webSearch')}>
+              <Globe className="h-4 w-4" />
+            </IconBtn>
+          </div>
+
+          {/* Right side: voice + send */}
+          <div className="flex items-center gap-1 pb-1 ml-1">
             <VoiceInput
               onTranscript={(text) => setValue((v) => v + (v ? ' ' : '') + text)}
               disabled={disabled || streaming}
             />
-            <IconToggle
-              active={webSearch}
-              onClick={() => setWebSearch((v) => !v)}
-              label={t('webSearch')}
-            >
-              <Globe className="h-4 w-4" />
-            </IconToggle>
-            {hasMarkdown && (
-              <IconToggle
-                active={preview}
-                onClick={() => setPreview((v) => !v)}
-                label="Markdown preview"
-              >
-                {preview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </IconToggle>
-            )}
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              accept="image/*,.pdf,.docx,.pptx,.txt,.md"
-              className="hidden"
-              onChange={(e) => {
-                handleFiles(e.target.files);
-                e.target.value = '';
-              }}
-            />
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => {
-                handleFiles(e.target.files);
-                e.target.value = '';
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
             {streaming ? (
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.95 }}
                 onClick={onStop}
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-error-container text-on-error-container transition-colors hover:bg-error"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/80 text-white transition-colors hover:bg-red-500"
               >
-                <Square className="h-4 w-4" fill="currentColor" />
+                <Square className="h-3.5 w-3.5" fill="currentColor" />
               </motion.button>
             ) : (
               <motion.button
@@ -291,22 +269,43 @@ export function ChatInput({
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSubmit}
                 disabled={disabled || (!value.trim() && attachments.length === 0)}
-                className={cn(
-                  'flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-on-primary transition-all disabled:opacity-30',
-                  'hover:shadow-[0_0_24px_-4px_rgba(123,255,238,0.8)]',
-                )}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#00fbfb] text-[#000510] transition-all disabled:opacity-30 hover:shadow-[0_0_16px_-4px_rgba(0,251,251,0.8)]"
               >
-                <ArrowUp className="h-5 w-5" />
+                <ArrowUp className="h-4 w-4" />
               </motion.button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Hidden file inputs */}
+      <input
+        ref={fileRef}
+        type="file"
+        multiple
+        accept="image/*,.pdf,.docx,.pptx,.txt,.md"
+        className="hidden"
+        onChange={(e) => {
+          handleFiles(e.target.files);
+          e.target.value = '';
+        }}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          handleFiles(e.target.files);
+          e.target.value = '';
+        }}
+      />
     </div>
   );
 }
 
-function IconToggle({
+function IconBtn({
   children,
   active,
   onClick,
@@ -327,11 +326,11 @@ function IconToggle({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       className={cn(
-        'flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant transition-all',
+        'flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition-all',
         disabled
           ? 'opacity-30 cursor-not-allowed'
           : active
-            ? 'bg-primary/15 text-primary'
+            ? 'bg-[#00fbfb]/15 text-[#00fbfb]'
             : 'hover:bg-white/5 hover:text-on-surface',
       )}
     >
