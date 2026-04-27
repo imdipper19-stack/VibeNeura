@@ -3,7 +3,6 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card } from '@/components/ui/card';
 import { Sparkles, ShieldCheck } from 'lucide-react';
 import { GoogleButton } from '@/components/auth/google-button';
-import { TelegramButton } from '@/components/auth/telegram-button';
 
 export default async function LoginPage({
   params,
@@ -13,7 +12,6 @@ export default async function LoginPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('auth');
-  const botUsername = process.env.TELEGRAM_BOT_USERNAME || process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 bg-gradient-to-b from-[#000510] to-[#000000]">
@@ -37,7 +35,6 @@ export default async function LoginPage({
 
         <div className="mt-8 space-y-3">
           <GoogleButton label={t('googleCta')} />
-          <TelegramButton botUsername={botUsername} label={t('telegramCta')} />
         </div>
 
         <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-[#839493]">

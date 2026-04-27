@@ -110,6 +110,9 @@ export default async function LandingPage({
             <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">
               Конфиденциальность
             </Link>
+            <a href="mailto:vibeneura@internet.ru" className="hover:text-white transition-colors">
+              Тех. поддержка: vibeneura@internet.ru
+            </a>
           </div>
         </div>
       </footer>
