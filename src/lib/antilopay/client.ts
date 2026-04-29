@@ -18,9 +18,9 @@ function signRequest(jsonBody: string): string {
   if (!privateKeyBase64) throw new Error('Antilopay is not configured.');
 
   const privateKeyPem =
-    '-----BEGIN RSA PRIVATE KEY-----\n' +
+    '-----BEGIN PRIVATE KEY-----\n' +
     privateKeyBase64 +
-    '\n-----END RSA PRIVATE KEY-----';
+    '\n-----END PRIVATE KEY-----';
 
   const sign = crypto.createSign('RSA-SHA256');
   sign.update(jsonBody);
