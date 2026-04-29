@@ -10,22 +10,27 @@ const REFERRAL_BONUS_TOKENS = 10_000;
 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
-  const sig = req.headers.get('x-signature') ?? '';
+  const sig = req.headers.get('x-apay-callback') ?? '';
 
   if (!verifyWebhookSignature(raw, sig)) {
     return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });
   }
 
   const event = JSON.parse(raw) as {
+    type: string;
     payment_id: string;
     order_id: string;
-    status: 'success' | 'failed' | 'pending';
+    status: string;
     amount: number;
+    original_amount: number;
   };
+
+  if (event.type !== 'payment') {
+    return NextResponse.json({ ok: true });
+  }
 
   const tx = await prisma.transaction.findUnique({ where: { providerRef: event.payment_id } });
   if (!tx) {
-    // Unknown payment — acknowledge to avoid retries but flag for audit.
     console.warn('[antilopay] unknown payment', event.payment_id);
     return NextResponse.json({ ok: true });
   }
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (event.status === 'failed') {
+  if (event.status === 'FAIL') {
     await prisma.transaction.update({
       where: { id: tx.id },
       data: { status: TransactionStatus.FAILED, completedAt: new Date() },
@@ -42,7 +47,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (event.status !== 'success') {
+  if (event.status !== 'SUCCESS') {
     return NextResponse.json({ ok: true });
   }
 
@@ -64,7 +69,6 @@ export async function POST(req: NextRequest) {
         data: { tokenBalance: { increment: item.tokens } },
       });
     } else {
-      // PRO_PASS — extend from the later of now / current pass end.
       const user = await db.user.findUnique({ where: { id: tx.userId } });
       if (!user) return;
       const base = user.proPassUntil && user.proPassUntil > new Date() ? user.proPassUntil : new Date();
@@ -75,7 +79,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Referral bonus — pays out exactly once (on the invitee's first completed purchase).
     const user = await db.user.findUnique({ where: { id: tx.userId } });
     if (user?.referredById) {
       const alreadyPaid = await db.transaction.findFirst({

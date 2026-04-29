@@ -32,19 +32,24 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online';
   try {
+    const productName =
+      item.kind === 'TOKEN_PACK'
+        ? `${item.tokens.toLocaleString()} токенов`
+        : `PRO Pass — ${item.days} дн.`;
+
     const payment = await createPayment({
       orderId: tx.id,
       amount: item.priceRub,
+      productName,
       description:
         item.kind === 'TOKEN_PACK'
-          ? `vibeneura: ${item.tokens.toLocaleString()} tokens`
-          : `vibeneura PRO Pass — ${item.days} days`,
+          ? `VibeNeura: ${item.tokens.toLocaleString()} токенов`
+          : `VibeNeura PRO Pass — ${item.days} дней`,
       customerEmail: session.user.email ?? `${session.user.id}@vibeneura.local`,
       successUrl: `${appUrl}/ru/billing?status=success`,
       failUrl: `${appUrl}/ru/billing?status=fail`,
-      webhookUrl: `${appUrl}/api/antilopay/webhook`,
     });
 
     await prisma.transaction.update({
@@ -54,7 +59,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ paymentUrl: payment.payment_url });
   } catch (err: any) {
-    // Antilopay credentials are not configured — return a stub url so dev can iterate UI.
     if (String(err?.message || '').includes('not configured')) {
       return NextResponse.json({
         paymentUrl: `${appUrl}/ru/billing?status=stub&tx=${tx.id}`,

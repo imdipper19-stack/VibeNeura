@@ -1,66 +1,85 @@
-// Antilopay payment gateway — server-side stub.
-// Replace BASE_URL / signature logic with the production spec once credentials are issued.
-
 import 'server-only';
-import crypto from 'node:crypto';
+import * as crypto from 'node:crypto';
 
-const BASE_URL = 'https://gate.antilopay.com/api/v1';
+const BASE_URL = 'https://lk.antilopay.com/api/v1';
 
 type CreatePaymentParams = {
   orderId: string;
-  amount: number; // RUB
-  currency?: string;
+  amount: number;
   description: string;
+  productName: string;
   customerEmail: string;
   successUrl: string;
   failUrl: string;
-  webhookUrl: string;
 };
 
-function sign(payload: Record<string, unknown>, secret: string): string {
-  const str = Object.keys(payload)
-    .sort()
-    .map((k) => `${k}=${payload[k]}`)
-    .join('&');
-  return crypto.createHmac('sha256', secret).update(str).digest('hex');
+function signRequest(jsonBody: string): string {
+  const privateKeyBase64 = process.env.ANTILOPAY_SECRET_KEY;
+  if (!privateKeyBase64) throw new Error('Antilopay is not configured.');
+
+  const privateKeyPem =
+    '-----BEGIN RSA PRIVATE KEY-----\n' +
+    privateKeyBase64 +
+    '\n-----END RSA PRIVATE KEY-----';
+
+  const sign = crypto.createSign('RSA-SHA256');
+  sign.update(jsonBody);
+  return sign.sign(privateKeyPem, 'base64');
 }
 
 export async function createPayment(params: CreatePaymentParams) {
   const projectId = process.env.ANTILOPAY_PROJECT_ID;
-  const secret = process.env.ANTILOPAY_SECRET_KEY;
-  if (!projectId || !secret) {
+  const secretId = process.env.ANTILOPAY_SECRET_ID;
+  if (!projectId || !secretId) {
     throw new Error('Antilopay is not configured.');
   }
 
   const body = {
-    project_id: projectId,
-    order_id: params.orderId,
+    project_identificator: projectId,
     amount: params.amount,
-    currency: params.currency ?? 'RUB',
+    order_id: params.orderId,
+    currency: 'RUB',
+    product_name: params.productName,
+    product_type: 'services',
     description: params.description,
-    customer_email: params.customerEmail,
     success_url: params.successUrl,
     fail_url: params.failUrl,
-    webhook_url: params.webhookUrl,
+    customer: {
+      email: params.customerEmail,
+    },
   };
-  const signature = sign(body, secret);
+
+  const jsonBody = JSON.stringify(body);
+  const signature = signRequest(jsonBody);
 
   const res = await fetch(`${BASE_URL}/payment/create`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-signature': signature },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Apay-Secret-Id': secretId,
+      'X-Apay-Sign': signature,
+      'X-Apay-Sign-Version': '1',
+    },
+    body: jsonBody,
   });
-  if (!res.ok) throw new Error(`Antilopay create failed: ${res.status}`);
-  return (await res.json()) as { payment_url: string; payment_id: string };
+
+  const data = await res.json();
+  if (data.code !== 0) {
+    throw new Error(`Antilopay error ${data.code}: ${data.error ?? 'unknown'}`);
+  }
+  return data as { code: number; payment_id: string; payment_url: string };
 }
 
 export function verifyWebhookSignature(rawBody: string, headerSig: string): boolean {
-  const secret = process.env.ANTILOPAY_WEBHOOK_SECRET ?? process.env.ANTILOPAY_SECRET_KEY;
-  if (!secret) return false;
-  const calc = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-  try {
-    return crypto.timingSafeEqual(Buffer.from(calc), Buffer.from(headerSig));
-  } catch {
-    return false;
-  }
+  const publicKeyBase64 = process.env.ANTILOPAY_CALLBACK_KEY;
+  if (!publicKeyBase64) return false;
+
+  const publicKeyPem =
+    '-----BEGIN PUBLIC KEY-----\n' +
+    publicKeyBase64 +
+    '\n-----END PUBLIC KEY-----';
+
+  const verify = crypto.createVerify('RSA-SHA256');
+  verify.update(rawBody);
+  return verify.verify(publicKeyPem, headerSig, 'base64');
 }
