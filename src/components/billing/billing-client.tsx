@@ -80,7 +80,7 @@ export function BillingClient({
                   <Zap className="h-3 w-3 text-primary" /> {p.titleKey}
                 </div>
                 <div className="mt-2 font-display text-3xl font-semibold">
-                  {(p.tokens / 1000).toLocaleString()}K
+                  {Math.round(p.tokens / 1000)}K
                 </div>
                 <div className="text-xs uppercase tracking-wider text-on-surface-variant">
                   {t('tokens')}

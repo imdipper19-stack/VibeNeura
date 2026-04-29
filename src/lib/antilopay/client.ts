@@ -71,7 +71,7 @@ export async function createPayment(params: CreatePaymentParams) {
 }
 
 export function verifyWebhookSignature(rawBody: string, headerSig: string): boolean {
-  const publicKeyBase64 = process.env.ANTILOPAY_CALLBACK_KEY;
+  const publicKeyBase64 = process.env.ANTILOPAY_PUBLIC_KEY ?? process.env.ANTILOPAY_CALLBACK_KEY;
   if (!publicKeyBase64) return false;
 
   const publicKeyPem =
