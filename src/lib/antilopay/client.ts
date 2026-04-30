@@ -70,28 +70,16 @@ export async function createPayment(params: CreatePaymentParams) {
   return data as { code: number; payment_id: string; payment_url: string };
 }
 
-export function verifyWebhookSignature(rawBody: string, headerSig: string): boolean {
+export function verifyWebhookSignature(rawBody: Buffer, headerSig: string): boolean {
   const publicKeyBase64 = process.env.ANTILOPAY_PUBLIC_KEY ?? process.env.ANTILOPAY_CALLBACK_KEY;
   if (!publicKeyBase64) return false;
 
-  const formatted = publicKeyBase64.replace(/(.{64})/g, '$1\n').trim();
-  const publicKeyPem =
-    '-----BEGIN PUBLIC KEY-----\n' +
-    formatted +
-    '\n-----END PUBLIC KEY-----';
-
-  console.log('[antilopay] PEM first line:', publicKeyPem.split('\n')[1]?.slice(0, 30));
-  console.log('[antilopay] rawBody preview:', rawBody.slice(0, 100));
-  console.log('[antilopay] headerSig preview:', headerSig.slice(0, 40));
+  const publicKeyDer = Buffer.from(publicKeyBase64, 'base64');
+  const keyObject = crypto.createPublicKey({ key: publicKeyDer, format: 'der', type: 'spki' });
 
   try {
-    const verify = crypto.createVerify('RSA-SHA256');
-    verify.update(rawBody);
-    const result = verify.verify(publicKeyPem, headerSig, 'base64');
-    console.log('[antilopay] verify result:', result);
-    return result;
-  } catch (err) {
-    console.error('[antilopay] verify threw:', err);
+    return crypto.createVerify('SHA256').update(rawBody).verify(keyObject, headerSig, 'base64');
+  } catch {
     return false;
   }
 }

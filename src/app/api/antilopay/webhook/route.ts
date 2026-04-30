@@ -9,18 +9,15 @@ export const runtime = 'nodejs';
 const REFERRAL_BONUS_TOKENS = 10_000;
 
 export async function POST(req: NextRequest) {
-  console.log('[antilopay] webhook received', new Date().toISOString());
-  const raw = await req.text();
+  const rawBuffer = Buffer.from(await req.arrayBuffer());
   const sig = req.headers.get('x-apay-callback') ?? '';
-  console.log('[antilopay] body length:', raw.length, 'sig:', sig.slice(0, 20) + '...');
 
-  const sigValid = verifyWebhookSignature(raw, sig);
-  console.log('[antilopay] signature valid:', sigValid);
-  console.log('[antilopay] full body:', raw);
-  // TODO: re-enable signature check once we fix verification
-  // if (!sigValid) {
-  //   return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });
-  // }
+  if (!verifyWebhookSignature(rawBuffer, sig)) {
+    console.warn('[antilopay] signature verification FAILED');
+    return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });
+  }
+
+  const raw = rawBuffer.toString('utf-8');
 
   const event = JSON.parse(raw) as {
     type: string;
