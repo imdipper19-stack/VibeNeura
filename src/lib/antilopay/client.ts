@@ -80,7 +80,18 @@ export function verifyWebhookSignature(rawBody: string, headerSig: string): bool
     formatted +
     '\n-----END PUBLIC KEY-----';
 
-  const verify = crypto.createVerify('RSA-SHA256');
-  verify.update(rawBody);
-  return verify.verify(publicKeyPem, headerSig, 'base64');
+  console.log('[antilopay] PEM first line:', publicKeyPem.split('\n')[1]?.slice(0, 30));
+  console.log('[antilopay] rawBody preview:', rawBody.slice(0, 100));
+  console.log('[antilopay] headerSig preview:', headerSig.slice(0, 40));
+
+  try {
+    const verify = crypto.createVerify('RSA-SHA256');
+    verify.update(rawBody);
+    const result = verify.verify(publicKeyPem, headerSig, 'base64');
+    console.log('[antilopay] verify result:', result);
+    return result;
+  } catch (err) {
+    console.error('[antilopay] verify threw:', err);
+    return false;
+  }
 }
