@@ -19,6 +19,7 @@ declare module 'next-auth' {
       referralCode: string;
       tokenBalance: number;
       proPassUntil: string | null;
+      role: string;
     } & DefaultSession['user'];
   }
 }
@@ -28,6 +29,7 @@ type OmniJWT = {
   referralCode?: string;
   tokenBalance?: number;
   proPassUntil?: string | null;
+  role?: string;
   [key: string]: unknown;
 };
 
@@ -164,12 +166,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (t.uid) {
         const dbUser = await prisma.user.findUnique({
           where: { id: t.uid },
-          select: { referralCode: true, tokenBalance: true, proPassUntil: true },
+          select: { referralCode: true, tokenBalance: true, proPassUntil: true, role: true },
         });
         if (dbUser) {
           t.referralCode = dbUser.referralCode;
           t.tokenBalance = dbUser.tokenBalance;
           t.proPassUntil = dbUser.proPassUntil ? dbUser.proPassUntil.toISOString() : null;
+          t.role = dbUser.role;
         }
       }
       return t as typeof token;
@@ -181,6 +184,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.referralCode = t.referralCode ?? '';
         session.user.tokenBalance = t.tokenBalance ?? 0;
         session.user.proPassUntil = t.proPassUntil ?? null;
+        session.user.role = t.role ?? 'USER';
       }
       return session;
     },
