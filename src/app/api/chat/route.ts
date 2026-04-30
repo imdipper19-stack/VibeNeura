@@ -7,7 +7,7 @@ import { MessageRole, TransactionStatus, TransactionType } from '@prisma/client'
 import { FALLBACK_MODELS } from '@/lib/ai/models';
 import { checkAndConsumeDailyLimit } from '@/lib/billing/daily-limit';
 import { searchWeb, formatSearchResultsForContext } from '@/lib/ai/web-search';
-import { parseDocx, parsePdf, parsePptx } from '@/lib/documents/parse';
+import { parseDocx, parsePdf, parsePptx, parseXlsx, parseCsv, parseText, parseCode } from '@/lib/documents/parse';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -64,6 +64,35 @@ function isPptxAttachment(a: { name: string; mimeType: string; dataUrl?: string 
   return /\.pptx$/i.test(a.name);
 }
 
+function isXlsxAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  if (
+    a.mimeType ===
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  )
+    return true;
+  return /\.xlsx$/i.test(a.name);
+}
+
+function isCsvAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  if (a.mimeType === 'text/csv') return true;
+  return /\.csv$/i.test(a.name);
+}
+
+function isTextAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  if (a.mimeType === 'text/plain' || a.mimeType === 'text/markdown') return true;
+  return /\.(txt|md)$/i.test(a.name);
+}
+
+const CODE_EXTENSIONS = /\.(py|js|ts|tsx|jsx|java|cpp|c|cs|go|rs|rb|php|swift|kt|sql|sh|yml|yaml|json|xml|html|css|scss|r|m|lua)$/i;
+
+function isCodeAttachment(a: { name: string; mimeType: string; dataUrl?: string }): boolean {
+  if (!a.dataUrl) return false;
+  return CODE_EXTENSIONS.test(a.name);
+}
+
 async function injectDocContent(
   messages: z.infer<typeof MessageSchema>[],
 ): Promise<z.infer<typeof MessageSchema>[]> {
@@ -82,6 +111,14 @@ async function injectDocContent(
         parsed = await parsePdf(a.dataUrl!);
       } else if (isPptxAttachment(a)) {
         parsed = await parsePptx(a.dataUrl!);
+      } else if (isXlsxAttachment(a)) {
+        parsed = await parseXlsx(a.dataUrl!);
+      } else if (isCsvAttachment(a)) {
+        parsed = await parseCsv(a.dataUrl!);
+      } else if (isCodeAttachment(a)) {
+        parsed = await parseCode(a.dataUrl!, a.name);
+      } else if (isTextAttachment(a)) {
+        parsed = await parseText(a.dataUrl!);
       }
       if (!parsed) continue;
       const note = parsed.truncated

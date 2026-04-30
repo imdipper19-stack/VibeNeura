@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           ? `VibeNeura: ${item.tokens.toLocaleString()} токенов`
           : `VibeNeura PRO Pass — ${item.days} дней`,
       customerEmail: session.user.email ?? `${session.user.id}@vibeneura.local`,
-      successUrl: `${appUrl}/ru/billing?status=success`,
+      successUrl: `${appUrl}/ru/billing?status=success&back=chat`,
       failUrl: `${appUrl}/ru/billing?status=fail`,
     });
 

@@ -138,7 +138,7 @@ export function BillingClient({
                   </span>
                 </div>
                 <ul className="mt-4 space-y-1 text-xs text-on-surface-variant">
-                  {['Claude Opus 4.6', 'GPT 5.4 Omni', 'Без автопродления'].map((x) => (
+                  {['Claude Opus 4.7', 'GPT 5.5', 'Без автопродления'].map((x) => (
                     <li key={x} className="flex items-center gap-2">
                       <Check className="h-3 w-3 text-tertiary" /> {x}
                     </li>

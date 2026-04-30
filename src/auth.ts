@@ -7,6 +7,7 @@
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
+import bcrypt from 'bcryptjs';
 import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma/client';
 import { verifyTelegramAuth, type TelegramAuthPayload } from '@/lib/auth/telegram';
@@ -98,6 +99,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           image: user.avatarUrl,
           email: user.email,
+        };
+      },
+    }),
+    Credentials({
+      id: 'email',
+      name: 'Email',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(raw) {
+        const email = raw?.email as string | undefined;
+        const password = raw?.password as string | undefined;
+        if (!email || !password) return null;
+
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user || !user.passwordHash) return null;
+        if (!user.emailVerified) return null;
+
+        const valid = await bcrypt.compare(password, user.passwordHash);
+        if (!valid) return null;
+
+        return {
+          id: user.id,
+          name: user.name ?? user.email,
+          email: user.email,
+          image: user.avatarUrl,
         };
       },
     }),

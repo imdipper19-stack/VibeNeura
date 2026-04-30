@@ -59,6 +59,13 @@ model User {
   googleId   String? @unique
   telegramId BigInt? @unique
 
+  passwordHash       String?
+  emailVerified      Boolean   @default(false)
+  emailVerifyToken   String?   @unique
+  emailVerifyExpires DateTime?
+  passwordResetToken   String?   @unique
+  passwordResetExpires DateTime?
+
   referralCode String  @unique
   referredById String?
   referredBy   User?   @relation("Referrals", fields: [referredById], references: [id])

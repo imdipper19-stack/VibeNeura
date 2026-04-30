@@ -1,15 +1,19 @@
 import Link from 'next/link';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card } from '@/components/ui/card';
-import { Sparkles, ShieldCheck } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { GoogleButton } from '@/components/auth/google-button';
+import { AuthForms } from '@/components/auth/auth-forms';
 
 export default async function LoginPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ verified?: string; error?: string }>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations('auth');
 
@@ -28,19 +32,18 @@ export default async function LoginPage({
           <span className="font-display text-lg font-semibold text-white">vibeneura</span>
         </Link>
 
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-white">
-          {t('loginTitle')}
-        </h1>
-        <p className="mt-2 text-sm text-[#b9cac9]">{t('loginSubtitle')}</p>
+        {sp.verified === '1' && (
+          <div className="mb-4 rounded-lg border border-tertiary/30 bg-tertiary/10 px-3 py-2 text-sm text-tertiary">
+            Email подтверждён! Теперь войдите в аккаунт.
+          </div>
+        )}
+        {sp.error === 'expired_token' && (
+          <div className="mb-4 rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">
+            Ссылка устарела. Зарегистрируйтесь снова.
+          </div>
+        )}
 
-        <div className="mt-8 space-y-3">
-          <GoogleButton label={t('googleCta')} />
-        </div>
-
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-[#839493]">
-          <ShieldCheck className="h-3.5 w-3.5 text-[#00fbfb]" />
-          <span>{t('noEmailNeeded')}</span>
-        </div>
+        <AuthForms locale={locale} googleLabel={t('googleCta')} />
       </Card>
     </div>
   );

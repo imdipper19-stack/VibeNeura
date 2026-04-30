@@ -26,6 +26,20 @@ function truncate(md: string): { markdown: string; truncated: boolean } {
   return { markdown: md, truncated: false };
 }
 
+const EXT_TO_LANG: Record<string, string> = {
+  '.py': 'python', '.js': 'javascript', '.ts': 'typescript', '.tsx': 'tsx',
+  '.jsx': 'jsx', '.java': 'java', '.cpp': 'cpp', '.c': 'c', '.cs': 'csharp',
+  '.go': 'go', '.rs': 'rust', '.rb': 'ruby', '.php': 'php', '.swift': 'swift',
+  '.kt': 'kotlin', '.sql': 'sql', '.sh': 'bash', '.yml': 'yaml', '.yaml': 'yaml',
+  '.json': 'json', '.xml': 'xml', '.html': 'html', '.css': 'css', '.scss': 'scss',
+  '.r': 'r', '.m': 'matlab', '.lua': 'lua',
+};
+
+function detectLang(filename: string): string {
+  const ext = filename.toLowerCase().match(/\.\w+$/)?.[0] ?? '';
+  return EXT_TO_LANG[ext] ?? '';
+}
+
 export async function parseDocx(dataUrl: string): Promise<ParsedDoc> {
   const buffer = stripDataUrl(dataUrl);
   try {
@@ -94,6 +108,94 @@ export async function parsePptx(dataUrl: string): Promise<ParsedDoc> {
       markdown: '',
       truncated: false,
       warnings: [`Не удалось прочитать PPTX: ${e?.message ?? 'unknown error'}`],
+    };
+  }
+}
+
+export async function parseXlsx(dataUrl: string): Promise<ParsedDoc> {
+  const buffer = stripDataUrl(dataUrl);
+  try {
+    const XLSX = await import('xlsx');
+    const wb = XLSX.read(buffer, { type: 'buffer' });
+    const parts: string[] = [];
+    for (const name of wb.SheetNames) {
+      const sheet = wb.Sheets[name];
+      const csv = XLSX.utils.sheet_to_csv(sheet);
+      const lines = csv.split('\n').filter((l) => l.trim());
+      if (lines.length === 0) continue;
+      const header = lines[0].split(',');
+      const rows = lines.slice(1).map((l) => l.split(','));
+      let md = `## ${name}\n\n`;
+      md += '| ' + header.join(' | ') + ' |\n';
+      md += '| ' + header.map(() => '---').join(' | ') + ' |\n';
+      for (const row of rows) {
+        md += '| ' + row.join(' | ') + ' |\n';
+      }
+      parts.push(md);
+    }
+    const combined = parts.join('\n\n');
+    const { markdown, truncated } = truncate(combined);
+    return { markdown: neutralizeControlTags(markdown), truncated, warnings: [] };
+  } catch (e: any) {
+    return {
+      markdown: '',
+      truncated: false,
+      warnings: [`Не удалось прочитать XLSX: ${e?.message ?? 'unknown error'}`],
+    };
+  }
+}
+
+export async function parseCsv(dataUrl: string): Promise<ParsedDoc> {
+  const buffer = stripDataUrl(dataUrl);
+  try {
+    const text = buffer.toString('utf-8');
+    const lines = text.split('\n').filter((l) => l.trim());
+    if (lines.length === 0) return { markdown: '', truncated: false, warnings: [] };
+    const header = lines[0].split(',');
+    let md = '| ' + header.join(' | ') + ' |\n';
+    md += '| ' + header.map(() => '---').join(' | ') + ' |\n';
+    for (const line of lines.slice(1)) {
+      md += '| ' + line.split(',').join(' | ') + ' |\n';
+    }
+    const { markdown, truncated } = truncate(md);
+    return { markdown: neutralizeControlTags(markdown), truncated, warnings: [] };
+  } catch (e: any) {
+    return {
+      markdown: '',
+      truncated: false,
+      warnings: [`Не удалось прочитать CSV: ${e?.message ?? 'unknown error'}`],
+    };
+  }
+}
+
+export async function parseText(dataUrl: string): Promise<ParsedDoc> {
+  const buffer = stripDataUrl(dataUrl);
+  try {
+    const text = buffer.toString('utf-8');
+    const { markdown, truncated } = truncate(text);
+    return { markdown: neutralizeControlTags(markdown), truncated, warnings: [] };
+  } catch (e: any) {
+    return {
+      markdown: '',
+      truncated: false,
+      warnings: [`Не удалось прочитать файл: ${e?.message ?? 'unknown error'}`],
+    };
+  }
+}
+
+export async function parseCode(dataUrl: string, filename: string): Promise<ParsedDoc> {
+  const buffer = stripDataUrl(dataUrl);
+  try {
+    const text = buffer.toString('utf-8');
+    const lang = detectLang(filename);
+    const wrapped = `\`\`\`${lang}\n${text}\n\`\`\``;
+    const { markdown, truncated } = truncate(wrapped);
+    return { markdown: neutralizeControlTags(markdown), truncated, warnings: [] };
+  } catch (e: any) {
+    return {
+      markdown: '',
+      truncated: false,
+      warnings: [`Не удалось прочитать код: ${e?.message ?? 'unknown error'}`],
     };
   }
 }

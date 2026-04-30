@@ -23,13 +23,6 @@ export type BillingItem =
 
 export const CATALOG: BillingItem[] = [
   {
-    id: 'pack_test',
-    kind: 'TOKEN_PACK',
-    tokens: 50_000,
-    priceRub: 10,
-    titleKey: 'Тестовый пакет',
-  },
-  {
     id: 'pack_50k',
     kind: 'TOKEN_PACK',
     tokens: 50_000,

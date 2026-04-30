@@ -87,8 +87,16 @@ export function ChatInput({
           'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
         /\.pptx$/i.test(file.name);
       const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      const isXlsx =
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        /\.xlsx$/i.test(file.name);
+      const isCsv = file.type === 'text/csv' || /\.csv$/i.test(file.name);
+      const isText = file.type === 'text/plain' || file.type === 'text/markdown' || /\.(txt|md)$/i.test(file.name);
+      const isCode = /\.(py|js|ts|tsx|jsx|java|cpp|c|cs|go|rs|rb|php|swift|kt|sql|sh|yml|yaml|json|xml|html|css|scss)$/i.test(file.name);
+      const isDocument = isDocx || isPptx || isPdf || isXlsx || isCsv || isText || isCode;
       let dataUrl: string | undefined;
-      if (isImage || isDocx || isPptx || isPdf) {
+      if (isImage || isDocument) {
         dataUrl = await new Promise<string>((resolve) => {
           const r = new FileReader();
           r.onload = () => resolve(r.result as string);
@@ -283,7 +291,7 @@ export function ChatInput({
         ref={fileRef}
         type="file"
         multiple
-        accept="image/*,.pdf,.docx,.pptx,.txt,.md"
+        accept="image/*,.pdf,.docx,.pptx,.xlsx,.csv,.txt,.md,.py,.js,.ts,.tsx,.jsx,.java,.cpp,.c,.cs,.go,.rs,.rb,.php,.swift,.kt,.sql,.sh,.yml,.yaml,.json,.xml,.html,.css,.scss"
         className="hidden"
         onChange={(e) => {
           handleFiles(e.target.files);
