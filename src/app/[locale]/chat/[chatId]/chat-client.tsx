@@ -11,7 +11,7 @@ import { Sparkles, Code2, FileText, Languages, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
-const VISION_FALLBACK_MODEL = 'claude-sonnet-4.5';
+const VISION_FALLBACK_MODEL = 'claude-sonnet-4.6';
 const PHOTO_SYSTEM_PROMPT =
   'Пользователь прислал фото задачи или конспекта. Внимательно извлеки весь текст и формулы с изображения, определи тип задачи и реши её пошагово. В конце укажи финальный ответ отдельно, выделенным шрифтом.';
 

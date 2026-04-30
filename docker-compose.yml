@@ -40,8 +40,7 @@ services:
       DATABASE_URL: postgresql://omnichat:omnichat@db:5432/omnichat?schema=public
       REDIS_URL: redis://redis:6379
       NODE_ENV: production
-      ANTHROPIC_BASE_URL: https://api.claudehub.fun
-      ANTHROPIC_AUTH_TOKEN: sk-hub-dUZaHHmlL9vFHZjtb6ffE3656ywMi3yk
+      WELLFLOW_API_KEY: wf_Oj7QFpK5foH0MrPG5jRPg1pzQBNvchhxjWkkQCyt5G8ML6Qo
       OPENROUTER_API_KEY: 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
       OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
       NEXTAUTH_SECRET: PPm5pLwu6AnmnM9JqU+4FwxQpSuSIqhyPXdDd3lE9Qk=

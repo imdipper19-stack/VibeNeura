@@ -1,8 +1,6 @@
-// OpenRouter — server-side OpenAI-compatible client (chat completions, streaming).
-// We use this for Llama 3, GPT, and any non-Anthropic model.
 import 'server-only';
 
-export type ORTurn = {
+export type WFTurn = {
   role: 'user' | 'assistant' | 'system';
   content:
     | string
@@ -18,66 +16,37 @@ type StreamEvent =
   | { type: 'done' }
   | { type: 'error'; message: string };
 
-const BASE_URL = process.env.OPENROUTER_BASE_URL ?? 'https://openrouter.ai/api/v1';
-const API_KEY = process.env.OPENROUTER_API_KEY ?? '';
+const BASE_URL = 'https://api.wellflow.dev/v1';
+const API_KEY = process.env.WELLFLOW_API_KEY ?? '';
 
-// Map our internal slug → exact OpenRouter model identifier.
-const MODEL_MAP: Record<string, string> = {};
-
-const FALLBACK_MODELS: Record<string, string[]> = {
-  'deepseek/deepseek-chat-v3-0324:free': [
-    'deepseek/deepseek-chat-v3-0324:free',
-    'qwen/qwen3-235b-a22b:free',
-    'google/gemma-3-27b-it:free',
-  ],
-};
-
-export function resolveOpenRouterModel(slug: string): string {
-  return MODEL_MAP[slug] ?? slug;
-}
-
-export async function* streamOpenRouter(params: {
+export async function* streamWellflow(params: {
   model: string;
-  messages: ORTurn[];
+  messages: WFTurn[];
   system?: string;
   maxTokens?: number;
   signal?: AbortSignal;
 }): AsyncGenerator<StreamEvent, void, void> {
   if (!API_KEY) {
-    yield { type: 'error', message: 'OPENROUTER_API_KEY is not configured' };
+    yield { type: 'error', message: 'WELLFLOW_API_KEY is not configured' };
     return;
   }
 
-  const allMessages: ORTurn[] = params.system
+  const allMessages: WFTurn[] = params.system
     ? [{ role: 'system', content: params.system }, ...params.messages]
     : params.messages;
 
-  const resolvedModel = resolveOpenRouterModel(params.model);
-  const fallbacks = FALLBACK_MODELS[resolvedModel];
-
-  const body: Record<string, unknown> = {
-    model: resolvedModel,
+  const body = {
+    model: params.model,
     messages: allMessages,
     stream: true,
     max_tokens: params.maxTokens ?? 4096,
-    // Исключаем нездоровые upstream-провайдеры (OpenInference часто отдаёт 503 "no healthy upstream"
-    // на бесплатных моделях). allow_fallbacks=true → OpenRouter сам подберёт другого провайдера.
-    provider: {
-      ignore: ['OpenInference', 'Venice'],
-      allow_fallbacks: true,
-    },
   };
-  if (fallbacks && fallbacks.length > 1) {
-    body.models = fallbacks;
-  }
 
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       authorization: `Bearer ${API_KEY}`,
-      'http-referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online',
-      'x-title': 'vibeneura',
     },
     body: JSON.stringify(body),
     signal: params.signal,
@@ -85,7 +54,7 @@ export async function* streamOpenRouter(params: {
 
   if (!res.ok || !res.body) {
     const text = await res.text().catch(() => '');
-    yield { type: 'error', message: `OpenRouter ${res.status}: ${text || res.statusText}` };
+    yield { type: 'error', message: `Wellflow ${res.status}: ${text || res.statusText}` };
     return;
   }
 

@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { type ChatTurn } from '@/lib/ai/claude-hub';
-import { streamAi } from '@/lib/ai/router';
+import { streamAi, type RouteTurn } from '@/lib/ai/router';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma/client';
 import { MessageRole, TransactionStatus, TransactionType } from '@prisma/client';
@@ -108,8 +107,8 @@ async function injectDocContent(
 function buildTurns(
   messages: z.infer<typeof MessageSchema>[],
   supportsVision: boolean,
-): { system?: string; turns: ChatTurn[] } {
-  const turns: ChatTurn[] = [];
+): { system?: string; turns: RouteTurn[] } {
+  const turns: RouteTurn[] = [];
   let system: string | undefined;
 
   for (const m of messages) {
@@ -119,7 +118,7 @@ function buildTurns(
     }
     const role = m.role === 'USER' ? 'user' : 'assistant';
 
-    const blocks: Extract<ChatTurn['content'], Array<unknown>> = [];
+    const blocks: Extract<RouteTurn['content'], Array<unknown>> = [];
     if (m.content) blocks.push({ type: 'text', text: m.content });
 
     if (supportsVision && m.attachments) {
