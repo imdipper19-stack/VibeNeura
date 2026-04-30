@@ -1,13 +1,20 @@
 import 'server-only';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
+
 const FROM = 'vibeneura <noreply@vibeneura.online>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online';
 
 export async function sendVerificationEmail(to: string, token: string) {
   const link = `${APP_URL}/api/auth/verify-email?token=${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: 'Подтвердите email — vibeneura',
@@ -25,7 +32,7 @@ export async function sendVerificationEmail(to: string, token: string) {
 
 export async function sendPasswordResetEmail(to: string, token: string) {
   const link = `${APP_URL}/ru/reset-password?token=${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: 'Сброс пароля — vibeneura',
