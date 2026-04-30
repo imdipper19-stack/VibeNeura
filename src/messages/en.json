@@ -63,7 +63,10 @@
     "urgent": "Emergency",
     "paywallTitle": "Photos need a smart model",
     "paywallBody": "Llama 3 can't analyse images. Grab a token pack from 99 ₽ and use Claude Sonnet to solve problems from a photo.",
-    "paywallCta": "Buy for 99 ₽"
+    "paywallCta": "Buy for 99 ₽",
+    "dailyLimitTitle": "Daily limit reached",
+    "dailyLimitBody": "You've used all 20 free requests for today. Get tokens for unlimited access or try again tomorrow.",
+    "tryTomorrow": "Try tomorrow"
   },
   "models": {
     "free": "Free",

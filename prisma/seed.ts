@@ -61,7 +61,14 @@ const MODELS = [
   },
 ];
 
+const ALLOWED_SLUGS = MODELS.map((m) => m.slug);
+
 async function main() {
+  await prisma.modelRegistry.updateMany({
+    where: { slug: { notIn: ALLOWED_SLUGS } },
+    data: { enabled: false },
+  });
+
   for (const m of MODELS) {
     await prisma.modelRegistry.upsert({
       where: { slug: m.slug },

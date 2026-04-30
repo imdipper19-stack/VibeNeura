@@ -7,6 +7,7 @@ import { MessageBubble } from '@/components/chat/message-bubble';
 import { ChatInput, type Attachment } from '@/components/chat/chat-input';
 import { ModelSelector, type ModelOption } from '@/components/chat/model-selector';
 import { PaywallModal } from '@/components/billing/paywall-modal';
+import { DailyLimitModal } from '@/components/billing/daily-limit-modal';
 import { Sparkles, Code2, FileText, Languages, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
@@ -32,6 +33,7 @@ export function ChatClient({ initialMessages, initialChatId, initialModelSlug }:
     useChatStore();
   const [models, setModels] = useState<ModelOption[]>([]);
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [dailyLimitOpen, setDailyLimitOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -133,13 +135,12 @@ export function ChatClient({ initialMessages, initialChatId, initialModelSlug }:
       });
       if (!res.ok || !res.body) {
         if (res.status === 402) {
-          appendToAssistant(assistantId, '\n\n_⚠ Недостаточно токенов. Пополните баланс или активируйте PRO Pass._');
+          setPaywallOpen(true);
           setStreaming(false);
           return;
         }
         if (res.status === 429) {
-          const data = await res.json().catch(() => ({}));
-          appendToAssistant(assistantId, `\n\n_⚠ ${data.message ?? 'Дневной лимит исчерпан.'}_`);
+          setDailyLimitOpen(true);
           setStreaming(false);
           return;
         }
@@ -233,6 +234,7 @@ export function ChatClient({ initialMessages, initialChatId, initialModelSlug }:
       </div>
 
       <PaywallModal open={paywallOpen} onOpenChange={setPaywallOpen} />
+      <DailyLimitModal open={dailyLimitOpen} onOpenChange={setDailyLimitOpen} />
     </div>
   );
 }
