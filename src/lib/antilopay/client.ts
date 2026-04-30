@@ -74,9 +74,10 @@ export function verifyWebhookSignature(rawBody: string, headerSig: string): bool
   const publicKeyBase64 = process.env.ANTILOPAY_PUBLIC_KEY ?? process.env.ANTILOPAY_CALLBACK_KEY;
   if (!publicKeyBase64) return false;
 
+  const formatted = publicKeyBase64.replace(/(.{64})/g, '$1\n').trim();
   const publicKeyPem =
     '-----BEGIN PUBLIC KEY-----\n' +
-    publicKeyBase64 +
+    formatted +
     '\n-----END PUBLIC KEY-----';
 
   const verify = crypto.createVerify('RSA-SHA256');
