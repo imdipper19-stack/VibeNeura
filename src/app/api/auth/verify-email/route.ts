@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/client';
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vibeneura.online';
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token');
   if (!token) {
-    return NextResponse.redirect(new URL('/ru/login?error=invalid_token', req.url));
+    return NextResponse.redirect(`${APP_URL}/ru/login?error=invalid_token`);
   }
 
   const user = await prisma.user.findUnique({ where: { emailVerifyToken: token } });
   if (!user || !user.emailVerifyExpires || user.emailVerifyExpires < new Date()) {
-    return NextResponse.redirect(new URL('/ru/login?error=expired_token', req.url));
+    return NextResponse.redirect(`${APP_URL}/ru/login?error=expired_token`);
   }
 
   await prisma.user.update({
@@ -21,5 +23,5 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  return NextResponse.redirect(new URL('/ru/login?verified=1', req.url));
+  return NextResponse.redirect(`${APP_URL}/ru/login?verified=1`);
 }
