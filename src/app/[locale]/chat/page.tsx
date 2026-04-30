@@ -12,6 +12,7 @@ import { useSettingsStore } from '@/store/settings-store';
 import { Sparkles, Code2, FileText, Languages, Lightbulb, ArrowDown, Search, ImagePlus, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
 
 const PHOTO_SYSTEM_PROMPT =
   'Пользователь прислал фото задачи или конспекта. Внимательно извлеки весь текст и формулы с изображения, определи тип задачи и реши её пошагово. В конце укажи финальный ответ отдельно, выделенным шрифтом.';
@@ -20,6 +21,8 @@ export default function ChatPage() {
   const t = useTranslations('chat');
   const tm = useTranslations('chat.suggestions');
   const { update: updateSession } = useSession();
+  const params = useParams();
+  const locale = params.locale as string;
   const { messages, streaming, modelSlug, chatId, addMessage, appendToAssistant, setStreaming, setModel, setChatId, setThinking, setSources, setDone } =
     useChatStore();
   const [models, setModels] = useState<ModelOption[]>([]);
@@ -52,7 +55,7 @@ export default function ChatPage() {
   }, [flushBatch]);
 
   useEffect(() => {
-    fetch('/api/models')
+    fetch(`/api/models?locale=${locale}`)
       .then((r) => r.json())
       .then((d) => {
         setModels(d.models);

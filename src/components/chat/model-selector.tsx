@@ -81,7 +81,7 @@ export function ModelSelector({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="glass-strong absolute left-0 top-[calc(100%+8px)] z-30 w-80 rounded-xl p-2 shadow-2xl"
+            className="glass-strong absolute left-0 top-[calc(100%+8px)] z-30 w-[calc(100vw-2rem)] sm:w-80 max-w-sm rounded-xl p-2 shadow-2xl"
           >
             {freeModels.length > 0 && (
               <ModelGroup

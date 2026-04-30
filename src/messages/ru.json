@@ -90,6 +90,16 @@
     "invitedCount": "приглашено: {count}",
     "earned": "получено токенов: {count}"
   },
+  "folders": {
+    "newFolder": "Новая папка",
+    "folderName": "Название папки",
+    "rename": "Переименовать",
+    "delete": "Удалить папку",
+    "deleteConfirm": "Удалить папку? Чаты вернутся в общий список.",
+    "moveToFolder": "В папку",
+    "removeFromFolder": "Убрать из папки",
+    "unfiled": "Все чаты"
+  },
   "common": {
     "loading": "Загрузка...",
     "error": "Что-то пошло не так",
@@ -106,8 +116,12 @@
     "feature1Title": "Без VPN",
     "feature1Desc": "Все запросы идут через наш сервер. Полный доступ из любой точки мира.",
     "feature2Title": "Все модели",
-    "feature2Desc": "GPT 5.4, Claude Opus 4.6, VibeneuraAI — переключайтесь одним кликом.",
+    "feature2Desc": "GPT 5.5, Claude Opus 4.7, Claude Sonnet 4.6 — переключайтесь одним кликом.",
     "feature3Title": "Прозрачная оплата",
-    "feature3Desc": "Купите токены или подпишитесь на Premium. Никаких скрытых платежей."
+    "feature3Desc": "Купите токены или подпишитесь на Premium. Никаких скрытых платежей.",
+    "badge": "Без VPN · Без лимитов · Все модели",
+    "footerTerms": "Оферта",
+    "footerPrivacy": "Конфиденциальность",
+    "footerSupport": "Тех. поддержка"
   }
 }

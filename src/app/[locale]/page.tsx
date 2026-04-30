@@ -46,13 +46,13 @@ export default async function LandingPage({
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-5xl px-6 pt-24 pb-32 text-center">
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 pt-16 sm:pt-24 pb-20 sm:pb-32 text-center">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#00fbfb]/20 bg-[#00fbfb]/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-[#b9cac9] backdrop-blur">
           <span className="h-1.5 w-1.5 rounded-full bg-[#00fbfb] animate-pulse" />
-          No VPN · No limits · All models
+          {t('badge')}
         </div>
 
-        <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-white drop-shadow-[0_0_40px_rgba(0,251,251,0.25)]">
+        <h1 className="font-display text-3xl sm:text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-white drop-shadow-[0_0_40px_rgba(0,251,251,0.25)]">
           {t('heroTitle')}
         </h1>
 
@@ -76,7 +76,7 @@ export default async function LandingPage({
       </section>
 
       {/* Features */}
-      <section id="features" className="mx-auto grid max-w-6xl gap-6 px-6 pb-32 md:grid-cols-3">
+      <section id="features" className="mx-auto grid max-w-6xl gap-4 sm:gap-6 px-4 sm:px-6 pb-20 sm:pb-32 md:grid-cols-3">
         <FeatureCard
           icon={<BookOpen className="h-6 w-6" />}
           title={t('feature1Title')}
@@ -105,13 +105,13 @@ export default async function LandingPage({
           <span>© {new Date().getFullYear()} vibeneura.online · ОсОО «Глобал Бридж»</span>
           <div className="flex gap-5">
             <Link href={`/${locale}/terms`} className="hover:text-white transition-colors">
-              Оферта
+              {t('footerTerms')}
             </Link>
             <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">
-              Конфиденциальность
+              {t('footerPrivacy')}
             </Link>
             <a href="mailto:vibeneura@internet.ru" className="hover:text-white transition-colors">
-              Тех. поддержка: vibeneura@internet.ru
+              {t('footerSupport')}: vibeneura@internet.ru
             </a>
           </div>
         </div>

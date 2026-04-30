@@ -11,17 +11,26 @@ import {
   Sparkles,
   LogOut,
   ChevronDown,
+  ChevronRight,
   Mail,
+  FolderPlus,
+  Folder,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { cn } from '@/lib/utils/cn';
 import { ReferralBanner } from '@/components/layout/referral-banner';
 import { useChatStore } from '@/store/chat-store';
 import { ChatItemMenu } from '@/components/chat/chat-item-menu';
 import { RenameChatModal } from '@/components/chat/rename-chat-modal';
+import { FolderModal } from '@/components/chat/folder-modal';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
-type ChatSummary = { id: string; title: string; updatedAt: string };
+type ChatSummary = { id: string; title: string; updatedAt: string; folderId?: string | null };
+type FolderInfo = { id: string; name: string; chatCount: number };
 
 function groupChatsByDate(chats: ChatSummary[]): Record<string, ChatSummary[]> {
   const now = new Date();
@@ -50,6 +59,7 @@ function groupChatsByDate(chats: ChatSummary[]): Record<string, ChatSummary[]> {
 export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: ChatSummary[]; onNavigate?: () => void }) {
   const t = useTranslations('nav');
   const tb = useTranslations('billing');
+  const tf = useTranslations('folders');
   const pathname = usePathname();
   const params = useParams();
   const router = useRouter();
@@ -57,10 +67,16 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
   const { data: session, status } = useSession();
   const isAuthed = status === 'authenticated';
   const [chats, setChats] = useState<ChatSummary[]>(initialChats);
+  const [folders, setFolders] = useState<FolderInfo[]>([]);
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const reset = useChatStore((s) => s.reset);
 
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renamingChat, setRenamingChat] = useState<ChatSummary | null>(null);
+
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [folderModalMode, setFolderModalMode] = useState<'create' | 'rename'>('create');
+  const [editingFolder, setEditingFolder] = useState<FolderInfo | null>(null);
 
   const refreshChats = () => {
     if (!isAuthed) return;
@@ -70,8 +86,17 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
       .catch(() => {});
   };
 
+  const refreshFolders = () => {
+    if (!isAuthed) return;
+    fetch('/api/folders')
+      .then((r) => (r.ok ? r.json() : { folders: [] }))
+      .then((d) => setFolders(d.folders ?? []))
+      .catch(() => {});
+  };
+
   useEffect(() => {
     refreshChats();
+    refreshFolders();
   }, [isAuthed, pathname]);
 
   const handleRename = (chat: ChatSummary) => {
@@ -110,6 +135,55 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
     }
   };
 
+  const handleMoveToFolder = async (chatId: string, folderId: string | null) => {
+    await fetch(`/api/chats/${chatId}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ folderId }),
+    });
+    refreshChats();
+    refreshFolders();
+  };
+
+  const handleCreateFolder = () => {
+    setEditingFolder(null);
+    setFolderModalMode('create');
+    setFolderModalOpen(true);
+  };
+
+  const handleRenameFolder = (folder: FolderInfo) => {
+    setEditingFolder(folder);
+    setFolderModalMode('rename');
+    setFolderModalOpen(true);
+  };
+
+  const handleSaveFolder = async (name: string) => {
+    if (folderModalMode === 'create') {
+      await fetch('/api/folders', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+    } else if (editingFolder) {
+      await fetch(`/api/folders/${editingFolder.id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+    }
+    refreshFolders();
+  };
+
+  const handleDeleteFolder = async (folderId: string) => {
+    await fetch(`/api/folders/${folderId}`, { method: 'DELETE' });
+    refreshFolders();
+    refreshChats();
+  };
+
+  const toggleFolder = (folderId: string) => {
+    setCollapsed((prev) => ({ ...prev, [folderId]: !prev[folderId] }));
+  };
+
   const displayName = session?.user?.name || (isAuthed ? 'vibeneura' : 'Гость');
   const displayHandle = session?.user?.email || (isAuthed ? 'signed in' : 'guest@vibeneura');
   const avatarLetter = (session?.user?.name?.[0] || 'A').toUpperCase();
@@ -119,8 +193,40 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
     : String(tokenBalance);
   const isPro = session?.user?.proPassUntil && new Date(session.user.proPassUntil) > new Date();
 
-  const groupedChats = groupChatsByDate(chats);
-  const groupOrder: Array<keyof typeof groupedChats> = ['today', 'yesterday', 'thisWeek', 'older'];
+  const folderSimple = folders.map((f) => ({ id: f.id, name: f.name }));
+  const unfiledChats = chats.filter((c) => !c.folderId);
+  const groupedUnfiled = groupChatsByDate(unfiledChats);
+  const groupOrder: Array<keyof typeof groupedUnfiled> = ['today', 'yesterday', 'thisWeek', 'older'];
+
+  const renderChatItem = (c: ChatSummary) => {
+    const href = `/${locale}/chat/${c.id}`;
+    const active = pathname === href;
+    return (
+      <div key={c.id} className="group relative flex items-center">
+        <Link
+          href={href}
+          onClick={onNavigate}
+          className={cn(
+            'flex-1 truncate rounded-md px-3 py-2 text-sm transition-colors pr-8',
+            active
+              ? 'bg-primary/10 text-primary border border-primary/20'
+              : 'text-on-surface-variant hover:bg-white/5 hover:text-on-surface',
+          )}
+        >
+          {c.title}
+        </Link>
+        <ChatItemMenu
+          chatId={c.id}
+          currentFolderId={c.folderId}
+          folders={folderSimple}
+          onRename={() => handleRename(c)}
+          onArchive={() => handleArchive(c.id)}
+          onDelete={() => handleDelete(c.id)}
+          onMoveToFolder={(fid) => handleMoveToFolder(c.id, fid)}
+        />
+      </div>
+    );
+  };
 
   return (
     <aside className={cn(
@@ -157,22 +263,66 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
         </motion.div>
       </button>
 
-      {/* History */}
+      {/* Chat list */}
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex items-center justify-between px-2 pb-2 text-xs uppercase tracking-widest text-on-surface-variant/70">
-          <span className="flex items-center gap-1.5">
-            <History className="h-3 w-3" /> {t('history')}
-          </span>
-          <ChevronDown className="h-3 w-3" />
-        </div>
+        {/* Folders header + new folder */}
+        {isAuthed && (
+          <div className="flex items-center justify-between px-2 pb-2">
+            <span className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-on-surface-variant/70">
+              <History className="h-3 w-3" /> {t('history')}
+            </span>
+            <button
+              onClick={handleCreateFolder}
+              className="p-1 rounded hover:bg-white/10 transition-colors"
+              title={tf('newFolder')}
+            >
+              <FolderPlus className="h-3.5 w-3.5 text-on-surface-variant/70 hover:text-primary" />
+            </button>
+          </div>
+        )}
+
         <nav className="flex-1 space-y-3 overflow-y-auto pr-1">
-          {chats.length === 0 && (
-            <div className="px-2 py-4 text-center text-xs text-on-surface-variant/60">
-              —
-            </div>
+          {chats.length === 0 && folders.length === 0 && (
+            <div className="px-2 py-4 text-center text-xs text-on-surface-variant/60">—</div>
           )}
+
+          {/* Folders */}
+          {folders.map((folder) => {
+            const folderChats = chats.filter((c) => c.folderId === folder.id);
+            const isCollapsed = collapsed[folder.id] ?? false;
+            return (
+              <div key={folder.id}>
+                <div className="group/folder flex items-center gap-1 px-1 pb-1">
+                  <button
+                    onClick={() => toggleFolder(folder.id)}
+                    className="flex flex-1 items-center gap-1.5 min-w-0"
+                  >
+                    <ChevronRight className={cn('h-3 w-3 text-on-surface-variant/50 transition-transform shrink-0', !isCollapsed && 'rotate-90')} />
+                    <Folder className="h-3 w-3 text-on-surface-variant/50 shrink-0" />
+                    <span className="text-[10px] uppercase tracking-widest text-on-surface-variant/50 truncate">
+                      {folder.name}
+                    </span>
+                    <span className="text-[10px] text-on-surface-variant/30 shrink-0">
+                      {folderChats.length}
+                    </span>
+                  </button>
+                  <FolderMenu
+                    onRename={() => handleRenameFolder(folder)}
+                    onDelete={() => handleDeleteFolder(folder.id)}
+                  />
+                </div>
+                {!isCollapsed && (
+                  <div className="space-y-0.5 pl-2">
+                    {folderChats.map(renderChatItem)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Unfiled chats by date */}
           {groupOrder.map((groupKey) => {
-            const groupChats = groupedChats[groupKey];
+            const groupChats = groupedUnfiled[groupKey];
             if (groupChats.length === 0) return null;
             return (
               <div key={groupKey}>
@@ -180,32 +330,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
                   {t(groupKey)}
                 </div>
                 <div className="space-y-0.5">
-                  {groupChats.map((c) => {
-                    const href = `/${locale}/chat/${c.id}`;
-                    const active = pathname === href;
-                    return (
-                      <div key={c.id} className="group relative flex items-center">
-                        <Link
-                          href={href}
-                          onClick={onNavigate}
-                          className={cn(
-                            'flex-1 truncate rounded-md px-3 py-2 text-sm transition-colors pr-8',
-                            active
-                              ? 'bg-primary/10 text-primary border border-primary/20'
-                              : 'text-on-surface-variant hover:bg-white/5 hover:text-on-surface',
-                          )}
-                        >
-                          {c.title}
-                        </Link>
-                        <ChatItemMenu
-                          chatId={c.id}
-                          onRename={() => handleRename(c)}
-                          onArchive={() => handleArchive(c.id)}
-                          onDelete={() => handleDelete(c.id)}
-                        />
-                      </div>
-                    );
-                  })}
+                  {groupChats.map(renderChatItem)}
                 </div>
               </div>
             );
@@ -213,7 +338,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
         </nav>
       </div>
 
-      {/* Referral banner — only when authenticated */}
+      {/* Referral banner */}
       <ReferralBanner />
 
       {/* Billing card */}
@@ -293,6 +418,50 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
         currentTitle={renamingChat?.title ?? ''}
         onSave={handleSaveRename}
       />
+
+      <FolderModal
+        open={folderModalOpen}
+        onOpenChange={setFolderModalOpen}
+        mode={folderModalMode}
+        currentName={editingFolder?.name ?? ''}
+        onSave={handleSaveFolder}
+      />
     </aside>
+  );
+}
+
+function FolderMenu({ onRename, onDelete }: { onRename: () => void; onDelete: () => void }) {
+  const tf = useTranslations('folders');
+  const [open, setOpen] = useState(false);
+
+  return (
+    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
+      <DropdownMenu.Trigger asChild>
+        <button className="p-0.5 rounded opacity-0 group-hover/folder:opacity-100 hover:bg-white/10 transition-opacity">
+          <MoreHorizontal className="h-3.5 w-3.5 text-on-surface-variant" />
+        </button>
+      </DropdownMenu.Trigger>
+      {open && (
+        <DropdownMenu.Portal forceMount>
+          <DropdownMenu.Content side="right" align="start" sideOffset={4} className="glass-strong rounded-lg p-1 min-w-[130px] z-50 border border-white/10">
+            <DropdownMenu.Item
+              className="flex items-center gap-2 px-3 py-1.5 text-xs text-on-surface-variant rounded-md cursor-pointer outline-none hover:bg-white/5 hover:text-on-surface transition-colors"
+              onClick={onRename}
+            >
+              <Pencil className="h-3 w-3" />
+              {tf('rename')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Separator className="my-1 h-px bg-white/10" />
+            <DropdownMenu.Item
+              className="flex items-center gap-2 px-3 py-1.5 text-xs text-error rounded-md cursor-pointer outline-none hover:bg-error/10 transition-colors"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3 w-3" />
+              {tf('delete')}
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      )}
+    </DropdownMenu.Root>
   );
 }

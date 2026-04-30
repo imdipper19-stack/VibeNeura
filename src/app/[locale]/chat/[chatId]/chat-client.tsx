@@ -10,6 +10,7 @@ import { PaywallModal } from '@/components/billing/paywall-modal';
 import { Sparkles, Code2, FileText, Languages, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
 
 const VISION_FALLBACK_MODEL = 'claude-sonnet-4.6';
 const PHOTO_SYSTEM_PROMPT =
@@ -25,6 +26,8 @@ export function ChatClient({ initialMessages, initialChatId, initialModelSlug }:
   const t = useTranslations('chat');
   const tm = useTranslations('chat.suggestions');
   const { update: updateSession } = useSession();
+  const params = useParams();
+  const locale = params.locale as string;
   const { messages, streaming, modelSlug, chatId, addMessage, appendToAssistant, setStreaming, setModel, setChatId, setMessages } =
     useChatStore();
   const [models, setModels] = useState<ModelOption[]>([]);
@@ -44,7 +47,7 @@ export function ChatClient({ initialMessages, initialChatId, initialModelSlug }:
   }, [hydrated, initialMessages, initialChatId, initialModelSlug, setMessages, setChatId, setModel]);
 
   useEffect(() => {
-    fetch('/api/models')
+    fetch(`/api/models?locale=${locale}`)
       .then((r) => r.json())
       .then((d) => {
         setModels(d.models);

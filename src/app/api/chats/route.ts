@@ -13,10 +13,10 @@ export async function GET() {
     where: { userId: session.user.id, archived: false },
     orderBy: { updatedAt: 'desc' },
     take: 50,
-    select: { id: true, title: true, updatedAt: true },
+    select: { id: true, title: true, updatedAt: true, folderId: true },
   });
 
   return NextResponse.json({
-    chats: chats.map((c) => ({ id: c.id, title: c.title, updatedAt: c.updatedAt.toISOString() })),
+    chats: chats.map((c) => ({ id: c.id, title: c.title, updatedAt: c.updatedAt.toISOString(), folderId: c.folderId })),
   });
 }

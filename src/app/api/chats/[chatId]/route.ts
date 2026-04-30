@@ -55,11 +55,12 @@ export async function PATCH(
 
   const { chatId } = await params;
   const body = await req.json();
-  const { title, archived } = body as { title?: string; archived?: boolean };
+  const { title, archived, folderId } = body as { title?: string; archived?: boolean; folderId?: string | null };
 
-  const updateData: { title?: string; archived?: boolean } = {};
+  const updateData: { title?: string; archived?: boolean; folderId?: string | null } = {};
   if (title !== undefined) updateData.title = title.slice(0, 100);
   if (archived !== undefined) updateData.archived = archived;
+  if (folderId !== undefined) updateData.folderId = folderId;
 
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });

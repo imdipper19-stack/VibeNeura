@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { FALLBACK_MODELS } from '@/lib/ai/models';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
-  // Prefer DB when available, else fallback. We avoid importing prisma at module
-  // eval time so missing DB does not crash the build.
+export async function GET(req: NextRequest) {
+  const locale = req.nextUrl.searchParams.get('locale') ?? 'ru';
+
   try {
     const { prisma } = await import('@/lib/prisma/client');
     const models = await prisma.modelRegistry.findMany({
@@ -25,5 +25,15 @@ export async function GET() {
   } catch {
     // ignore — fallback below
   }
-  return NextResponse.json({ models: FALLBACK_MODELS });
+
+  const models = FALLBACK_MODELS.map((m) => ({
+    slug: m.slug,
+    displayName: m.displayName,
+    provider: m.provider,
+    description: locale === 'ru' ? m.descriptionRu : m.description,
+    tier: m.tier,
+    supportsVision: m.supportsVision,
+    supportsFiles: m.supportsFiles,
+  }));
+  return NextResponse.json({ models });
 }

@@ -7,24 +7,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
-type RenameChatModalProps = {
+type FolderModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentTitle: string;
-  onSave: (newTitle: string) => void;
+  mode: 'create' | 'rename';
+  currentName?: string;
+  onSave: (name: string) => void;
 };
 
-export function RenameChatModal({ open, onOpenChange, currentTitle, onSave }: RenameChatModalProps) {
-  const t = useTranslations('chat');
-  const [title, setTitle] = useState(currentTitle);
+export function FolderModal({ open, onOpenChange, mode, currentName = '', onSave }: FolderModalProps) {
+  const t = useTranslations('folders');
+  const tc = useTranslations('common');
+  const [name, setName] = useState(currentName);
 
   useEffect(() => {
-    if (open) setTitle(currentTitle);
-  }, [open, currentTitle]);
+    if (open) setName(currentName);
+  }, [open, currentName]);
 
   const handleSave = () => {
-    if (title.trim()) {
-      onSave(title.trim());
+    if (name.trim()) {
+      onSave(name.trim());
       onOpenChange(false);
     }
   };
@@ -52,7 +54,7 @@ export function RenameChatModal({ open, onOpenChange, currentTitle, onSave }: Re
               >
                 <div className="flex items-center justify-between mb-4">
                   <Dialog.Title className="text-lg font-semibold text-on-surface">
-                    {t('renameTitle')}
+                    {mode === 'create' ? t('newFolder') : t('rename')}
                   </Dialog.Title>
                   <Dialog.Close asChild>
                     <button className="p-1 rounded-lg hover:bg-white/10 transition-colors">
@@ -63,20 +65,21 @@ export function RenameChatModal({ open, onOpenChange, currentTitle, onSave }: Re
 
                 <input
                   type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-                  placeholder={t('renamePlaceholder')}
+                  placeholder={t('folderName')}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 transition-colors"
                   autoFocus
+                  maxLength={60}
                 />
 
                 <div className="flex justify-end gap-3 mt-6">
                   <Button variant="ghost" onClick={() => onOpenChange(false)}>
-                    {t('cancel')}
+                    {tc('cancel')}
                   </Button>
-                  <Button onClick={handleSave} disabled={!title.trim()}>
-                    {t('save')}
+                  <Button onClick={handleSave} disabled={!name.trim()}>
+                    {tc('save')}
                   </Button>
                 </div>
               </motion.div>

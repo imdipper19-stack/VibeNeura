@@ -90,6 +90,16 @@
     "invitedCount": "invited: {count}",
     "earned": "tokens earned: {count}"
   },
+  "folders": {
+    "newFolder": "New folder",
+    "folderName": "Folder name",
+    "rename": "Rename",
+    "delete": "Delete folder",
+    "deleteConfirm": "Delete this folder? Chats will be moved to unfiled.",
+    "moveToFolder": "Move to folder",
+    "removeFromFolder": "Remove from folder",
+    "unfiled": "All chats"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -106,8 +116,12 @@
     "feature1Title": "No VPN required",
     "feature1Desc": "All requests are proxied server-side. Full access from anywhere.",
     "feature2Title": "Every model",
-    "feature2Desc": "GPT 5.4, Claude Opus 4.6, VibeneuraAI — switch with one click.",
+    "feature2Desc": "GPT 5.5, Claude Opus 4.7, Claude Sonnet 4.6 — switch with one click.",
     "feature3Title": "Transparent pricing",
-    "feature3Desc": "Buy tokens or subscribe to Premium. No hidden fees."
+    "feature3Desc": "Buy tokens or subscribe to Premium. No hidden fees.",
+    "badge": "No VPN · No limits · All models",
+    "footerTerms": "Terms",
+    "footerPrivacy": "Privacy",
+    "footerSupport": "Support"
   }
 }
