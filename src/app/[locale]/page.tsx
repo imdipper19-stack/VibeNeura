@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Zap, Globe2, CreditCard, ArrowRight, Code2, Camera, BookOpen, UserPlus, MousePointerClick, MessageSquare, Check, X, ChevronDown } from 'lucide-react';
+import { Sparkles, Zap, Globe2, CreditCard, ArrowRight, Code2, Camera, BookOpen, UserPlus, MousePointerClick, MessageSquare, Check, X, ChevronDown, Wand2, Image as ImageIcon } from 'lucide-react';
 
 export default async function LandingPage({
   params,
@@ -162,6 +162,88 @@ export default async function LandingPage({
         />
       </section>
 
+      {/* Image Studio showcase */}
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 pb-20 sm:pb-32">
+        <div className="relative overflow-hidden rounded-3xl border border-[#dfb7ff]/15 bg-gradient-to-br from-[#dfb7ff]/[0.04] via-[#000510] to-[#568dff]/[0.04]">
+          {/* Purple glow */}
+          <div className="pointer-events-none absolute -top-20 -right-20 h-[300px] w-[300px] rounded-full bg-[#dfb7ff]/10 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 h-[200px] w-[200px] rounded-full bg-[#568dff]/10 blur-[80px]" />
+
+          <div className="relative grid md:grid-cols-2 gap-8 p-8 sm:p-12">
+            {/* Left: text */}
+            <div className="flex flex-col justify-center">
+              <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-[#dfb7ff]/20 bg-[#dfb7ff]/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#dfb7ff]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#dfb7ff] animate-pulse" />
+                {locale === 'ru' ? 'Новинка' : 'New'}
+              </div>
+              <h2 className="font-display text-2xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+                {locale === 'ru' ? 'Студия изображений' : 'Image Studio'}
+              </h2>
+              <p className="text-[#b9cac9] leading-relaxed mb-6">
+                {locale === 'ru'
+                  ? 'Генерируйте изображения с помощью ИИ прямо в Vibeneura. Модель Google Nano Banana создаст любую картинку по текстовому описанию — от иллюстраций до дизайн-концептов.'
+                  : 'Generate images with AI right in Vibeneura. Google Nano Banana model creates any image from a text description — from illustrations to design concepts.'}
+              </p>
+
+              <div className="space-y-3 mb-8">
+                {(locale === 'ru' ? [
+                  { icon: <Wand2 className="h-4 w-4" />, text: 'Генерация по текстовому описанию' },
+                  { icon: <ImageIcon className="h-4 w-4" />, text: 'Референсные изображения для стилизации' },
+                  { icon: <Zap className="h-4 w-4" />, text: 'Пакеты от 79 ₽' },
+                ] : [
+                  { icon: <Wand2 className="h-4 w-4" />, text: 'Generate from text description' },
+                  { icon: <ImageIcon className="h-4 w-4" />, text: 'Reference images for styling' },
+                  { icon: <Zap className="h-4 w-4" />, text: 'Packs from 79 ₽' },
+                ]).map((f, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dfb7ff]/10 text-[#dfb7ff] shrink-0">
+                      {f.icon}
+                    </div>
+                    <span className="text-sm text-[#dbe4e3]">{f.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link href={`/${locale}/login`}>
+                <Button size="lg" className="w-fit bg-gradient-to-r from-[#dfb7ff] to-[#568dff] text-[#000510] font-semibold hover:shadow-[0_0_30px_-4px_rgba(223,183,255,0.5)] group">
+                  {locale === 'ru' ? 'Попробовать бесплатно' : 'Try for free'}
+                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Right: visual mockup */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-full max-w-sm">
+                {/* Fake prompt card */}
+                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-2 w-2 rounded-full bg-[#dfb7ff]" />
+                    <span className="text-xs text-[#839493] font-medium">Google Nano Banana</span>
+                  </div>
+                  <div className="rounded-lg bg-white/5 px-3 py-2 text-sm text-[#b9cac9] mb-4">
+                    {locale === 'ru' ? '«Кот-космонавт на фоне галактики, цифровое искусство»' : '"Astronaut cat with galaxy background, digital art"'}
+                  </div>
+                  {/* Fake generated grid */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-[#dfb7ff]/20 via-[#568dff]/10 to-[#00fbfb]/10 flex items-center justify-center">
+                        <Wand2 className={`h-6 w-6 text-[#dfb7ff]/${20 + i * 10}`} style={{ opacity: 0.15 + i * 0.15 }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Floating price badge */}
+                <div className="absolute -bottom-4 -right-4 rounded-xl border border-[#dfb7ff]/30 bg-[#0d1515] px-4 py-2 shadow-xl">
+                  <p className="text-[10px] text-[#839493] uppercase tracking-wider">{locale === 'ru' ? 'от' : 'from'}</p>
+                  <p className="font-display text-lg font-bold" style={{ background: 'linear-gradient(135deg, #dfb7ff, #568dff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>7.9 ₽<span className="text-xs font-normal text-[#839493]"> / {locale === 'ru' ? 'изобр.' : 'img'}</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing comparison */}
       <section className="mx-auto max-w-4xl px-4 sm:px-6 pb-20 sm:pb-32">
         <h2 className="font-display text-2xl sm:text-4xl font-bold text-center text-white mb-4">
@@ -185,6 +267,7 @@ export default async function LandingPage({
               <PricingRow included label={locale === 'ru' ? '10 000 стартовых токенов' : '10,000 starter tokens'} />
               <PricingRow included label={locale === 'ru' ? '20 запросов в день' : '20 requests per day'} />
               <PricingRow included label={locale === 'ru' ? 'Зрение (фото)' : 'Vision (photos)'} />
+              <PricingRow included={false} label={locale === 'ru' ? 'Генерация изображений' : 'Image generation'} />
               <PricingRow included={false} label={locale === 'ru' ? 'Премиум модели' : 'Premium models'} />
               <PricingRow included={false} label={locale === 'ru' ? 'Загрузка файлов' : 'File uploads'} />
             </ul>
@@ -210,7 +293,7 @@ export default async function LandingPage({
               <PricingRow included label={locale === 'ru' ? 'Все модели: GPT, Claude Opus, Sonnet' : 'All models: GPT, Claude Opus, Sonnet'} />
               <PricingRow included label={locale === 'ru' ? 'Безлимитные запросы' : 'Unlimited requests'} />
               <PricingRow included label={locale === 'ru' ? 'Зрение и файлы' : 'Vision & files'} />
-              <PricingRow included label={locale === 'ru' ? 'Приоритетная скорость' : 'Priority speed'} />
+              <PricingRow included label={locale === 'ru' ? '🎨 Генерация изображений (от 79 ₽)' : '🎨 Image generation (from 79 ₽)'} />
               <PricingRow included label={locale === 'ru' ? '+20% токенов за первую покупку' : '+20% tokens on first purchase'} />
               <PricingRow included label={locale === 'ru' ? 'Без VPN' : 'No VPN needed'} />
             </ul>

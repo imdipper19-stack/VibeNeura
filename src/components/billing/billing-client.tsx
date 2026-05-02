@@ -4,17 +4,19 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Crown, Zap } from 'lucide-react';
+import { Check, Crown, Zap, Wand2 } from 'lucide-react';
 import { type BillingItem } from '@/lib/billing/catalog';
 import { cn } from '@/lib/utils/cn';
 
 export function BillingClient({
   packs,
   passes,
+  images,
   initialFocus,
 }: {
   packs: Extract<BillingItem, { kind: 'TOKEN_PACK' }>[];
   passes: Extract<BillingItem, { kind: 'PRO_PASS' }>[];
+  images?: Extract<BillingItem, { kind: 'IMAGE_PACK' }>[];
   initialFocus?: string;
 }) {
   const t = useTranslations('billing');
@@ -107,6 +109,70 @@ export function BillingClient({
           })}
         </div>
       </section>
+
+      {/* Image generation packs */}
+      {images && images.length > 0 && (
+        <section className="mt-12">
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5 text-[#dfb7ff]" />
+            <h2 className="font-display text-2xl font-semibold tracking-tight">Генерации изображений</h2>
+          </div>
+          <p className="mt-1 text-sm text-on-surface-variant">
+            Пополните баланс генераций для создания изображений с помощью ИИ
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {images.map((p) => {
+              const label = badgeLabel(p.badge);
+              return (
+                <Card
+                  key={p.id}
+                  className={cn(
+                    'relative transition-all',
+                    p.badge === 'popular' && 'ring-1 ring-[#dfb7ff]/40',
+                    p.badge === 'bestValue' && 'ring-1 ring-[#dfb7ff]/40',
+                  )}
+                >
+                  {label && (
+                    <span
+                      className={cn(
+                        'absolute -top-3 left-6 rounded-full px-3 py-0.5 text-[10px] font-semibold uppercase',
+                        p.badge === 'bestValue'
+                          ? 'bg-[#dfb7ff] text-[#000510]'
+                          : 'bg-[#dfb7ff] text-[#000510]',
+                      )}
+                    >
+                      {label}
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-on-surface-variant">
+                    <Wand2 className="h-3 w-3 text-[#dfb7ff]" /> {p.titleKey}
+                  </div>
+                  <div className="mt-2 font-display text-3xl font-semibold">
+                    {p.generations}
+                  </div>
+                  <div className="text-xs uppercase tracking-wider text-on-surface-variant">
+                    генераций
+                  </div>
+                  <div className="mt-1 text-[10px] text-on-surface-variant/60">
+                    {Math.round(p.priceRub / p.generations * 10) / 10} ₽ / изображение
+                  </div>
+                  <div className="mt-3 font-display text-2xl font-bold" style={{ background: 'linear-gradient(135deg, #dfb7ff, #568dff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    {p.priceRub} ₽
+                  </div>
+                  <Button
+                    className="mt-6 w-full bg-gradient-to-r from-[#dfb7ff] to-[#568dff] text-[#000510] hover:shadow-[0_0_20px_-4px_rgba(223,183,255,0.5)]"
+                    onClick={() => buy(p.id)}
+                    disabled={pendingId === p.id}
+                  >
+                    {pendingId === p.id ? '...' : t('buy')}
+                  </Button>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="mt-12">
         <div className="flex items-center gap-2">

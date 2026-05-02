@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { tokenPacks, proPasses } from '@/lib/billing/catalog';
+import { tokenPacks, proPasses, imagePacks } from '@/lib/billing/catalog';
 import { BillingClient } from '@/components/billing/billing-client';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -41,7 +41,7 @@ export default async function BillingPage({
       )}
 
       <div className="mt-10">
-        <BillingClient packs={tokenPacks()} passes={proPasses()} initialFocus={sp.focus} />
+        <BillingClient packs={tokenPacks()} passes={proPasses()} images={imagePacks()} initialFocus={sp.focus} />
       </div>
     </div>
   );

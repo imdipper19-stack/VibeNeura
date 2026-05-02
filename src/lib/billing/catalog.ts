@@ -1,7 +1,8 @@
 // Single source of truth for billing items.
-// Two categories:
+// Three categories:
 //   1. TOKEN_PACK — one-time top-up, no expiration.
 //   2. PRO_PASS  — time-limited unlimited access to premium models.
+//   3. IMAGE_PACK — one-time image generation credits top-up.
 
 export type BillingItem =
   | {
@@ -16,6 +17,14 @@ export type BillingItem =
       id: string;
       kind: 'PRO_PASS';
       days: number;
+      priceRub: number;
+      badge?: 'popular' | 'bestValue';
+      titleKey: string;
+    }
+  | {
+      id: string;
+      kind: 'IMAGE_PACK';
+      generations: number;
       priceRub: number;
       badge?: 'popular' | 'bestValue';
       titleKey: string;
@@ -69,6 +78,31 @@ export const CATALOG: BillingItem[] = [
     badge: 'bestValue',
     titleKey: 'Месячный пропуск',
   },
+  // Image generation packs
+  // Cost: ~$1/25 images ≈ 3.6₽/image
+  {
+    id: 'img_10',
+    kind: 'IMAGE_PACK',
+    generations: 10,
+    priceRub: 79,
+    titleKey: 'Стартовый',
+  },
+  {
+    id: 'img_30',
+    kind: 'IMAGE_PACK',
+    generations: 30,
+    priceRub: 179,
+    badge: 'popular',
+    titleKey: 'Оптимальный',
+  },
+  {
+    id: 'img_100',
+    kind: 'IMAGE_PACK',
+    generations: 100,
+    priceRub: 449,
+    badge: 'bestValue',
+    titleKey: 'Безлимитный',
+  },
 ];
 
 export function getItem(id: string): BillingItem | undefined {
@@ -81,4 +115,8 @@ export function tokenPacks() {
 
 export function proPasses() {
   return CATALOG.filter((i): i is Extract<BillingItem, { kind: 'PRO_PASS' }> => i.kind === 'PRO_PASS');
+}
+
+export function imagePacks() {
+  return CATALOG.filter((i): i is Extract<BillingItem, { kind: 'IMAGE_PACK' }> => i.kind === 'IMAGE_PACK');
 }

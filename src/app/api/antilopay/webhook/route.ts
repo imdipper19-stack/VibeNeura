@@ -83,6 +83,11 @@ export async function POST(req: NextRequest) {
         where: { id: tx.userId },
         data: { tokenBalance: { increment: tokensToAdd } },
       });
+    } else if (item.kind === 'IMAGE_PACK') {
+      await db.user.update({
+        where: { id: tx.userId },
+        data: { imageBalance: { increment: item.generations } },
+      });
     } else {
       const user = await db.user.findUnique({ where: { id: tx.userId } });
       if (!user) return;

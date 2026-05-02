@@ -21,6 +21,7 @@ import {
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
+  Wand2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
@@ -348,6 +349,43 @@ export function Sidebar({
             <span className="text-xs opacity-60">⌘K</span>
           </motion.div>
         </button>
+      )}
+
+      {/* Image Studio */}
+      {collapsed ? (
+        <SidebarTooltip label={locale === 'ru' ? 'Студия' : 'Studio'}>
+          <Link
+            href={`/${locale}/studio`}
+            onClick={onNavigate}
+            className={cn(
+              'flex h-10 w-10 mx-auto items-center justify-center rounded-lg border transition-all',
+              pathname.includes('/studio')
+                ? 'border-[#dfb7ff]/50 bg-[#dfb7ff]/10 text-[#dfb7ff]'
+                : 'border-[#dfb7ff]/20 bg-[#dfb7ff]/5 text-[#dfb7ff]/70 hover:border-[#dfb7ff]/40 hover:text-[#dfb7ff]',
+            )}
+          >
+            <Wand2 className="h-5 w-5" />
+          </Link>
+        </SidebarTooltip>
+      ) : (
+        <Link href={`/${locale}/studio`} onClick={onNavigate} className="block w-full">
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className={cn(
+              'flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm font-medium transition-all',
+              pathname.includes('/studio')
+                ? 'border-[#dfb7ff]/50 bg-[#dfb7ff]/10 text-[#dfb7ff]'
+                : 'border-[#dfb7ff]/20 bg-[#dfb7ff]/5 text-[#dfb7ff]/70 hover:border-[#dfb7ff]/40 hover:text-[#dfb7ff] hover:shadow-[0_0_16px_-4px_rgba(223,183,255,0.4)]',
+            )}
+          >
+            <span className="flex items-center gap-2">
+              <Wand2 className="h-4 w-4" />
+              {locale === 'ru' ? 'Студия изображений' : 'Image Studio'}
+            </span>
+            <span className="rounded-full bg-[#dfb7ff]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase">new</span>
+          </motion.div>
+        </Link>
       )}
 
       {/* Chat list */}

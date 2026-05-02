@@ -17,8 +17,11 @@ export async function POST(req: NextRequest) {
   const item = body.itemId ? getItem(body.itemId) : undefined;
   if (!item) return NextResponse.json({ error: 'unknown item' }, { status: 400 });
 
-  const txType = item.kind === 'TOKEN_PACK' ? TransactionType.TOKEN_PACK : TransactionType.PRO_PASS;
-  const amountTokens = item.kind === 'TOKEN_PACK' ? item.tokens : 0;
+  const txType =
+    item.kind === 'TOKEN_PACK' ? TransactionType.TOKEN_PACK
+    : item.kind === 'IMAGE_PACK' ? TransactionType.IMAGE_PACK
+    : TransactionType.PRO_PASS;
+  const amountTokens = item.kind === 'TOKEN_PACK' ? item.tokens : item.kind === 'IMAGE_PACK' ? item.generations : 0;
 
   const tx = await prisma.transaction.create({
     data: {
@@ -37,7 +40,9 @@ export async function POST(req: NextRequest) {
     const productName =
       item.kind === 'TOKEN_PACK'
         ? `${item.tokens.toLocaleString()} токенов`
-        : `PRO Pass — ${item.days} дн.`;
+        : item.kind === 'IMAGE_PACK'
+          ? `${item.generations} генераций`
+          : `PRO Pass — ${item.days} дн.`;
 
     const payment = await createPayment({
       orderId: tx.id,
@@ -46,7 +51,9 @@ export async function POST(req: NextRequest) {
       description:
         item.kind === 'TOKEN_PACK'
           ? `VibeNeura: ${item.tokens.toLocaleString()} токенов`
-          : `VibeNeura PRO Pass — ${item.days} дней`,
+          : item.kind === 'IMAGE_PACK'
+            ? `VibeNeura: ${item.generations} генераций изображений`
+            : `VibeNeura PRO Pass — ${item.days} дней`,
       customerEmail: session.user.email ?? `${session.user.id}@vibeneura.local`,
       successUrl: `${appUrl}/ru/billing?status=success&back=chat`,
       failUrl: `${appUrl}/ru/billing?status=fail`,

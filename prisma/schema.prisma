@@ -31,6 +31,7 @@ enum MessageRole {
 enum TransactionType {
   TOKEN_PACK
   PRO_PASS
+  IMAGE_PACK
   SPEND
   REFUND
   REFERRAL_BONUS
@@ -59,6 +60,7 @@ model User {
   plan         PlanTier  @default(FREE)
   banned       Boolean   @default(false)
   tokenBalance Int       @default(10000) // starter free tokens
+  imageBalance Int       @default(0)     // image generations (purchased only)
   proPassUntil DateTime?
   locale       String    @default("ru")
 
