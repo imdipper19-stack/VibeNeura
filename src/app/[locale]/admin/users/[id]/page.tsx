@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from 'recharts';
 
 interface UserProfile {
   user: {
     id: string; email: string | null; name: string | null; role: string;
-    plan: string; banned: boolean; tokenBalance: number; emailVerified: boolean;
+    plan: string; banned: boolean; tokenBalance: number; imageBalance: number; emailVerified: boolean;
     proPassUntil: string | null; locale: string; referralCode: string;
     createdAt: string; updatedAt: string;
   };
@@ -28,10 +28,38 @@ export default function AdminUserProfilePage() {
     fetch(`/api/admin/users/${id}`).then(r => r.json()).then(d => { setData(d); setLoading(false); });
   }, [id]);
 
+  const [grantAmount, setGrantAmount] = useState('');
+  const [granting, setGranting] = useState(false);
+  const [grantMsg, setGrantMsg] = useState<string | null>(null);
+
   if (loading) return <p className="text-[#839493]">Загрузка...</p>;
   if (!data?.user) return <p className="text-red-400">Пользователь не найден</p>;
 
   const { user, transactions, recentChats, modelUsage, dailyActivity } = data;
+
+  const grantGenerations = async () => {
+    const amount = parseInt(grantAmount);
+    if (!amount || amount <= 0) return;
+    setGranting(true);
+    setGrantMsg(null);
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'grantImageBalance', amount }),
+      });
+      if (res.ok) {
+        setGrantMsg(`+${amount} генераций выдано!`);
+        setGrantAmount('');
+        // Refresh data
+        const d = await fetch(`/api/admin/users/${id}`).then(r => r.json());
+        setData(d);
+      } else {
+        setGrantMsg('Ошибка');
+      }
+    } catch { setGrantMsg('Ошибка сети'); }
+    finally { setGranting(false); }
+  };
 
   const statusLabel = (s: string) => {
     switch (s) {
@@ -60,11 +88,38 @@ export default function AdminUserProfilePage() {
             {user.banned && <span className="rounded px-2 py-0.5 text-xs bg-red-500/20 text-red-400">Заблокирован</span>}
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
-          <InfoCard label="Баланс" value={`${user.tokenBalance.toLocaleString()} токенов`} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mt-6">
+          <InfoCard label="Баланс токенов" value={`${user.tokenBalance.toLocaleString()}`} />
+          <InfoCard label="Генерации" value={`${user.imageBalance}`} accent />
           <InfoCard label="PRO до" value={user.proPassUntil ? new Date(user.proPassUntil).toLocaleDateString('ru-RU') : '—'} />
           <InfoCard label="Реферальный код" value={user.referralCode} />
           <InfoCard label="Дата регистрации" value={new Date(user.createdAt).toLocaleDateString('ru-RU')} />
+        </div>
+
+        {/* Grant generations */}
+        <div className="mt-4 rounded-lg border border-[#dfb7ff]/15 bg-[#dfb7ff]/[0.03] p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Wand2 className="h-4 w-4 text-[#dfb7ff]" />
+            <span className="text-sm font-medium text-white">Выдать генерации</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="1"
+              value={grantAmount}
+              onChange={e => setGrantAmount(e.target.value)}
+              placeholder="Количество"
+              className="w-32 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-[#dfb7ff]/50"
+            />
+            <button
+              onClick={grantGenerations}
+              disabled={granting || !grantAmount}
+              className="rounded-lg bg-gradient-to-r from-[#dfb7ff] to-[#568dff] px-4 py-2 text-sm font-semibold text-[#000510] disabled:opacity-40"
+            >
+              {granting ? '...' : 'Выдать'}
+            </button>
+            {grantMsg && <span className="text-xs text-[#dfb7ff]">{grantMsg}</span>}
+          </div>
         </div>
       </div>
 
@@ -128,7 +183,7 @@ export default function AdminUserProfilePage() {
                 <div key={t.id} className="flex items-center justify-between rounded-lg border border-white/[0.04] px-3 py-2">
                   <div>
                     <span className={`rounded px-2 py-0.5 text-xs ${t.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : t.status === 'FAILED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{statusLabel(t.status)}</span>
-                    <span className="text-sm text-white ml-2">{t.type === 'TOKEN_PACK' ? 'Пакет токенов' : t.type === 'PRO_PASS' ? 'PRO подписка' : t.type}</span>
+                    <span className="text-sm text-white ml-2">{t.type === 'TOKEN_PACK' ? 'Пакет токенов' : t.type === 'PRO_PASS' ? 'PRO подписка' : t.type === 'IMAGE_PACK' ? 'Пакет генераций' : t.type}</span>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-white">{t.amountMoney} ₽</p>
@@ -146,11 +201,11 @@ export default function AdminUserProfilePage() {
   );
 }
 
-function InfoCard({ label, value }: { label: string; value: string }) {
+function InfoCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] px-4 py-3">
+    <div className={`rounded-lg border px-4 py-3 ${accent ? 'border-[#dfb7ff]/20 bg-[#dfb7ff]/[0.04]' : 'border-white/[0.04] bg-white/[0.02]'}`}>
       <p className="text-xs text-[#839493]">{label}</p>
-      <p className="text-sm text-white font-medium mt-1">{value}</p>
+      <p className={`text-sm font-medium mt-1 ${accent ? 'text-[#dfb7ff]' : 'text-white'}`}>{value}</p>
     </div>
   );
 }

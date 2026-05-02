@@ -12,7 +12,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     where: { id },
     select: {
       id: true, email: true, name: true, role: true, plan: true,
-      banned: true, tokenBalance: true, emailVerified: true,
+      banned: true, tokenBalance: true, imageBalance: true, emailVerified: true,
       proPassUntil: true, locale: true, referralCode: true,
       createdAt: true, updatedAt: true,
     },
@@ -25,7 +25,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const [transactions, recentChats, modelUsage, dailyMessages] = await Promise.all([
     prisma.transaction.findMany({
-      where: { userId: id, type: { in: ['TOKEN_PACK', 'PRO_PASS'] } },
+      where: { userId: id, type: { in: ['TOKEN_PACK', 'PRO_PASS', 'IMAGE_PACK'] } },
       select: { id: true, type: true, status: true, amountMoney: true, amountTokens: true, createdAt: true },
       orderBy: { createdAt: 'desc' },
       take: 50,
@@ -84,4 +84,41 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     })),
     dailyActivity: Object.entries(activity).map(([date, count]) => ({ date, count })),
   });
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await assertAdminApi();
+  if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const { id } = await params;
+  const body = await req.json();
+
+  if (body.action === 'grantImageBalance') {
+    const amount = parseInt(body.amount);
+    if (!amount || amount <= 0) {
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { imageBalance: { increment: amount } },
+    });
+
+    // Audit log
+    if (session.user?.id) {
+      await prisma.auditLog.create({
+        data: {
+          adminId: session.user.id,
+          action: 'GRANT_IMAGE_BALANCE',
+          targetType: 'User',
+          targetId: id,
+          details: { amount },
+        },
+      });
+    }
+
+    return NextResponse.json({ ok: true, granted: amount });
+  }
+
+  return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
 }
