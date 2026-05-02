@@ -228,7 +228,7 @@ export default function ChatPage() {
             ]}
           />
         ) : (
-          <div className="mx-auto max-w-3xl py-6">
+          <div className="mx-auto max-w-4xl py-6">
             {messages.map((m) => (
               <MessageBubble key={m.id} message={m} />
             ))}
@@ -250,7 +250,7 @@ export default function ChatPage() {
 
       {/* Input */}
       <div className="px-4 pb-6 pt-2 md:px-6">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <ChatInput
             onSubmit={send}
             disabled={streaming}
@@ -281,7 +281,7 @@ function EmptyState({
 }) {
   const t = useTranslations('chat');
   return (
-    <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center px-6 py-20 text-center">
+    <div className="mx-auto flex h-full max-w-4xl flex-col items-center justify-center px-6 py-20 text-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

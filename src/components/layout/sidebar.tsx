@@ -19,9 +19,12 @@ import {
   Pencil,
   Trash2,
   Settings,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { cn } from '@/lib/utils/cn';
 import { ReferralBanner } from '@/components/layout/referral-banner';
 import { useChatStore } from '@/store/chat-store';
@@ -57,7 +60,38 @@ function groupChatsByDate(chats: ChatSummary[]): Record<string, ChatSummary[]> {
   return groups;
 }
 
-export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: ChatSummary[]; onNavigate?: () => void }) {
+/* --- Tooltip wrapper for collapsed mode --- */
+function SidebarTooltip({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            side="right"
+            sideOffset={10}
+            className="z-[60] rounded-lg bg-surface-container-highest px-3 py-1.5 text-xs font-medium text-on-surface shadow-lg border border-white/10"
+          >
+            {label}
+            <Tooltip.Arrow className="fill-surface-container-highest" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+}
+
+export function Sidebar({
+  chats: initialChats = [],
+  onNavigate,
+  collapsed = false,
+  onToggleCollapse,
+}: {
+  chats?: ChatSummary[];
+  onNavigate?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
   const t = useTranslations('nav');
   const tb = useTranslations('billing');
   const tf = useTranslations('folders');
@@ -69,7 +103,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
   const isAuthed = status === 'authenticated';
   const [chats, setChats] = useState<ChatSummary[]>(initialChats);
   const [folders, setFolders] = useState<FolderInfo[]>([]);
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [folderCollapsed, setFolderCollapsed] = useState<Record<string, boolean>>({});
   const reset = useChatStore((s) => s.reset);
 
   const [renameModalOpen, setRenameModalOpen] = useState(false);
@@ -182,7 +216,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
   };
 
   const toggleFolder = (folderId: string) => {
-    setCollapsed((prev) => ({ ...prev, [folderId]: !prev[folderId] }));
+    setFolderCollapsed((prev) => ({ ...prev, [folderId]: !prev[folderId] }));
   };
 
   const displayName = session?.user?.name || (isAuthed ? 'vibeneura' : 'Гость');
@@ -202,6 +236,26 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
   const renderChatItem = (c: ChatSummary) => {
     const href = `/${locale}/chat/${c.id}`;
     const active = pathname === href;
+
+    if (collapsed) {
+      return (
+        <SidebarTooltip key={c.id} label={c.title}>
+          <Link
+            href={href}
+            onClick={onNavigate}
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+              active
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'text-on-surface-variant hover:bg-white/5 hover:text-on-surface',
+            )}
+          >
+            <MessageSquarePlus className="h-4 w-4" />
+          </Link>
+        </SidebarTooltip>
+      );
+    }
+
     return (
       <div key={c.id} className="group relative flex items-center">
         <Link
@@ -230,44 +284,76 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
   };
 
   return (
-    <aside className={cn(
-      "glass-strong h-screen w-[280px] flex-col gap-4 border-r border-white/5 p-4",
-      onNavigate ? "flex" : "hidden md:flex"
-    )}>
-      {/* Brand */}
-      <Link href={`/${locale}`} className="flex items-center gap-2 px-2 py-1" onClick={onNavigate}>
-        <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
-          <Sparkles className="h-5 w-5 text-surface" strokeWidth={2.5} />
-        </div>
-        <span className="font-display text-lg font-semibold tracking-tight">vibeneura</span>
-      </Link>
+    <aside
+      className={cn(
+        'glass-strong h-screen flex-col gap-4 border-r border-white/5 transition-all duration-300 ease-in-out',
+        collapsed ? 'w-[68px] p-2' : 'w-[280px] p-4',
+        onNavigate ? 'flex' : 'hidden md:flex',
+      )}
+    >
+      {/* Brand + collapse toggle */}
+      <div className="flex items-center justify-between">
+        <Link href={`/${locale}`} className={cn('flex items-center gap-2 px-2 py-1', collapsed && 'px-0 justify-center')} onClick={onNavigate}>
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
+            <Sparkles className="h-5 w-5 text-surface" strokeWidth={2.5} />
+          </div>
+          {!collapsed && <span className="font-display text-lg font-semibold tracking-tight">vibeneura</span>}
+        </Link>
+        {onToggleCollapse && !onNavigate && (
+          <button
+            onClick={onToggleCollapse}
+            className={cn(
+              'rounded-lg p-1.5 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-on-surface',
+              collapsed && 'mx-auto mt-1',
+            )}
+            aria-label="Toggle sidebar"
+          >
+            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        )}
+      </div>
 
       {/* New chat */}
-      <button
-        onClick={() => {
-          reset();
-          router.push(`/${locale}/chat`);
-          onNavigate?.();
-        }}
-        className="block w-full"
-      >
-        <motion.div
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-sm font-medium text-primary transition-all hover:border-primary hover:shadow-[0_0_16px_-4px_rgba(0,251,251,0.6)]"
+      {collapsed ? (
+        <SidebarTooltip label={t('newChat')}>
+          <button
+            onClick={() => {
+              reset();
+              router.push(`/${locale}/chat`);
+              onNavigate?.();
+            }}
+            className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg border border-primary/30 bg-primary/5 text-primary transition-all hover:border-primary hover:shadow-[0_0_16px_-4px_rgba(0,251,251,0.6)]"
+          >
+            <MessageSquarePlus className="h-5 w-5" />
+          </button>
+        </SidebarTooltip>
+      ) : (
+        <button
+          onClick={() => {
+            reset();
+            router.push(`/${locale}/chat`);
+            onNavigate?.();
+          }}
+          className="block w-full"
         >
-          <span className="flex items-center gap-2">
-            <MessageSquarePlus className="h-4 w-4" />
-            {t('newChat')}
-          </span>
-          <span className="text-xs opacity-60">⌘K</span>
-        </motion.div>
-      </button>
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-sm font-medium text-primary transition-all hover:border-primary hover:shadow-[0_0_16px_-4px_rgba(0,251,251,0.6)]"
+          >
+            <span className="flex items-center gap-2">
+              <MessageSquarePlus className="h-4 w-4" />
+              {t('newChat')}
+            </span>
+            <span className="text-xs opacity-60">⌘K</span>
+          </motion.div>
+        </button>
+      )}
 
       {/* Chat list */}
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Folders header + new folder */}
-        {isAuthed && (
+        {isAuthed && !collapsed && (
           <div className="flex items-center justify-between px-2 pb-2">
             <span className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-on-surface-variant/70">
               <History className="h-3 w-3" /> {t('history')}
@@ -282,15 +368,15 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
           </div>
         )}
 
-        <nav className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <nav className={cn('flex-1 overflow-y-auto pr-1', collapsed ? 'space-y-1' : 'space-y-3')}>
           {chats.length === 0 && folders.length === 0 && (
             <div className="px-2 py-4 text-center text-xs text-on-surface-variant/60">—</div>
           )}
 
           {/* Folders */}
-          {folders.map((folder) => {
+          {!collapsed && folders.map((folder) => {
             const folderChats = chats.filter((c) => c.folderId === folder.id);
-            const isCollapsed = collapsed[folder.id] ?? false;
+            const isFolderCollapsed = folderCollapsed[folder.id] ?? false;
             return (
               <div key={folder.id}>
                 <div className="group/folder flex items-center gap-1 px-1 pb-1">
@@ -298,7 +384,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
                     onClick={() => toggleFolder(folder.id)}
                     className="flex flex-1 items-center gap-1.5 min-w-0"
                   >
-                    <ChevronRight className={cn('h-3 w-3 text-on-surface-variant/50 transition-transform shrink-0', !isCollapsed && 'rotate-90')} />
+                    <ChevronRight className={cn('h-3 w-3 text-on-surface-variant/50 transition-transform shrink-0', !isFolderCollapsed && 'rotate-90')} />
                     <Folder className="h-3 w-3 text-on-surface-variant/50 shrink-0" />
                     <span className="text-[10px] uppercase tracking-widest text-on-surface-variant/50 truncate">
                       {folder.name}
@@ -312,7 +398,7 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
                     onDelete={() => handleDeleteFolder(folder.id)}
                   />
                 </div>
-                {!isCollapsed && (
+                {!isFolderCollapsed && (
                   <div className="space-y-0.5 pl-2">
                     {folderChats.map(renderChatItem)}
                   </div>
@@ -322,105 +408,148 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
           })}
 
           {/* Unfiled chats by date */}
-          {groupOrder.map((groupKey) => {
-            const groupChats = groupedUnfiled[groupKey];
-            if (groupChats.length === 0) return null;
-            return (
-              <div key={groupKey}>
-                <div className="px-2 pb-1 text-[10px] uppercase tracking-widest text-on-surface-variant/50">
-                  {t(groupKey)}
-                </div>
-                <div className="space-y-0.5">
-                  {groupChats.map(renderChatItem)}
-                </div>
-              </div>
-            );
-          })}
+          {collapsed
+            ? unfiledChats.slice(0, 8).map(renderChatItem)
+            : groupOrder.map((groupKey) => {
+                const groupChats = groupedUnfiled[groupKey];
+                if (groupChats.length === 0) return null;
+                return (
+                  <div key={groupKey}>
+                    <div className="px-2 pb-1 text-[10px] uppercase tracking-widest text-on-surface-variant/50">
+                      {t(groupKey)}
+                    </div>
+                    <div className="space-y-0.5">
+                      {groupChats.map(renderChatItem)}
+                    </div>
+                  </div>
+                );
+              })}
         </nav>
       </div>
 
-      {/* Referral banner */}
-      <ReferralBanner />
+      {/* Referral banner — only in expanded mode */}
+      {!collapsed && <ReferralBanner />}
 
       {/* Billing card */}
-      <div className="glass rounded-lg p-3">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs uppercase tracking-wider text-on-surface-variant">
-            {tb('balance')}
-          </span>
-          <span
-            className={cn(
-              'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase',
-              isPro ? 'bg-primary/20 text-primary' : 'bg-tertiary/15 text-tertiary',
-            )}
+      {collapsed ? (
+        <SidebarTooltip label={`${balanceLabel} ${tb('tokens')}`}>
+          <Link
+            href={`/${locale}/billing`}
+            onClick={onNavigate}
+            className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors hover:bg-primary/20"
           >
-            {isPro ? 'PRO' : tb('free')}
-          </span>
-        </div>
-        <div className="mb-3 flex items-baseline gap-1">
-          <span className="font-display text-2xl font-semibold text-on-surface">{balanceLabel}</span>
-          <span className="text-xs text-on-surface-variant">{tb('tokens')}</span>
-        </div>
-        <Link href={`/${locale}/billing`} onClick={onNavigate}>
-          <button className="w-full rounded-md bg-primary/90 px-3 py-2 text-xs font-medium text-on-primary transition-all hover:bg-primary hover:shadow-[0_0_18px_-4px_rgba(0,251,251,0.8)]">
-            {tb('topup')}
-          </button>
-        </Link>
-      </div>
-
-      {/* Email contact */}
-      <div className="flex flex-col gap-1">
-        <Link
-          href={`/${locale}/settings`}
-          onClick={onNavigate}
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
-        >
-          <Settings className="h-3.5 w-3.5" />
-          {t('settings')}
-        </Link>
-        <a
-          href="mailto:vibeneura@internet.ru"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
-        >
-          <Mail className="h-3.5 w-3.5" />
-          vibeneura@internet.ru
-        </a>
-      </div>
-
-      {/* User menu */}
-      <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary text-sm font-semibold text-surface">
-            {avatarLetter}
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-medium">{displayName}</span>
-            <span className="text-[10px] text-on-surface-variant truncate max-w-[140px]">
-              {displayHandle}
+            <span className="text-xs font-bold">{balanceLabel}</span>
+          </Link>
+        </SidebarTooltip>
+      ) : (
+        <div className="glass rounded-lg p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs uppercase tracking-wider text-on-surface-variant">
+              {tb('balance')}
+            </span>
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase',
+                isPro ? 'bg-primary/20 text-primary' : 'bg-tertiary/15 text-tertiary',
+              )}
+            >
+              {isPro ? 'PRO' : tb('free')}
             </span>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <ThemeToggle />
-          {isAuthed ? (
-            <button
-              onClick={() => signOut({ callbackUrl: `/${locale}` })}
-              className="rounded p-1 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-error"
-              aria-label={t('logout')}
-            >
-              <LogOut className="h-4 w-4" />
+          <div className="mb-3 flex items-baseline gap-1">
+            <span className="font-display text-2xl font-semibold text-on-surface">{balanceLabel}</span>
+            <span className="text-xs text-on-surface-variant">{tb('tokens')}</span>
+          </div>
+          <Link href={`/${locale}/billing`} onClick={onNavigate}>
+            <button className="w-full rounded-md bg-primary/90 px-3 py-2 text-xs font-medium text-on-primary transition-all hover:bg-primary hover:shadow-[0_0_18px_-4px_rgba(0,251,251,0.8)]">
+              {tb('topup')}
             </button>
-          ) : (
+          </Link>
+        </div>
+      )}
+
+      {/* Settings & Email */}
+      {collapsed ? (
+        <div className="flex flex-col items-center gap-1">
+          <SidebarTooltip label={t('settings')}>
             <Link
-              href={`/${locale}/login`}
+              href={`/${locale}/settings`}
               onClick={onNavigate}
-              className="rounded p-1 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
-              aria-label={t('login')}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
             >
-              <LogOut className="h-4 w-4 rotate-180" />
+              <Settings className="h-4 w-4" />
             </Link>
+          </SidebarTooltip>
+          <SidebarTooltip label="vibeneura@internet.ru">
+            <a
+              href="mailto:vibeneura@internet.ru"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+            >
+              <Mail className="h-4 w-4" />
+            </a>
+          </SidebarTooltip>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-1">
+          <Link
+            href={`/${locale}/settings`}
+            onClick={onNavigate}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+          >
+            <Settings className="h-3.5 w-3.5" />
+            {t('settings')}
+          </Link>
+          <a
+            href="mailto:vibeneura@internet.ru"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            vibeneura@internet.ru
+          </a>
+        </div>
+      )}
+
+      {/* User menu */}
+      <div className={cn(
+        'flex items-center rounded-lg border border-white/5 bg-white/[0.02] p-2',
+        collapsed ? 'justify-center' : 'justify-between',
+      )}>
+        <div className={cn('flex items-center', collapsed ? '' : 'gap-2 min-w-0')}>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary text-sm font-semibold text-surface">
+            {avatarLetter}
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col leading-tight min-w-0">
+              <span className="text-sm font-medium truncate max-w-[120px]">{displayName}</span>
+              <span className="text-[10px] text-on-surface-variant truncate max-w-[120px]">
+                {displayHandle}
+              </span>
+            </div>
           )}
         </div>
+        {!collapsed && (
+          <div className="flex items-center gap-1 shrink-0">
+            <ThemeToggle />
+            {isAuthed ? (
+              <button
+                onClick={() => signOut({ callbackUrl: `/${locale}` })}
+                className="rounded p-1 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-error"
+                aria-label={t('logout')}
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            ) : (
+              <Link
+                href={`/${locale}/login`}
+                onClick={onNavigate}
+                className="rounded p-1 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+                aria-label={t('login')}
+              >
+                <LogOut className="h-4 w-4 rotate-180" />
+              </Link>
+            )}
+          </div>
+        )}
       </div>
 
       <RenameChatModal

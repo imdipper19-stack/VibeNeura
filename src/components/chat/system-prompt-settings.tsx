@@ -37,7 +37,7 @@ export function SystemPromptSettings() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={() => setOpen(false)}
           >
             <motion.div
@@ -45,7 +45,7 @@ export function SystemPromptSettings() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-strong mx-4 w-full max-w-lg rounded-2xl p-6"
+              className="glass-strong w-full max-w-lg rounded-2xl p-6 border border-white/10"
             >
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-display text-lg font-semibold">Персона AI</h2>
@@ -63,7 +63,7 @@ export function SystemPromptSettings() {
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Ты — ..."
                 rows={5}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none placeholder:text-on-surface-variant/40 focus:border-primary/40"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none placeholder:text-on-surface-variant/40 focus:border-primary/40 resize-none"
               />
 
               <div className="mt-4 flex justify-end gap-2">

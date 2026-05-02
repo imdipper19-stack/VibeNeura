@@ -1,21 +1,16 @@
-import { setRequestLocale } from 'next-intl/server';
+'use client';
+
+import { useState } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 
-export default async function ChatLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden">
       <MobileNav />
-      <Sidebar />
+      <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed((v) => !v)} />
       <main className="relative flex flex-1 flex-col overflow-hidden">{children}</main>
     </div>
   );

@@ -59,13 +59,13 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
 
       <div
         className={cn(
-          'max-w-[80%] space-y-2',
+          'max-w-[85%] space-y-2',
           isUser ? 'items-end text-right' : 'items-start',
         )}
       >
         <div
           className={cn(
-            'inline-block rounded-2xl px-4 py-3 text-sm leading-relaxed',
+            'inline-block rounded-2xl px-5 py-4 text-base leading-relaxed',
             isUser
               ? 'bg-primary/15 text-on-surface border border-primary/20'
               : 'glass text-on-surface',
