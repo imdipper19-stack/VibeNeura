@@ -49,6 +49,15 @@ export function BillingClient({
         <h2 className="font-display text-2xl font-semibold tracking-tight">{t('tokenPacksTitle')}</h2>
         <p className="mt-1 text-sm text-on-surface-variant">{t('tokenPacksSubtitle')}</p>
 
+        {/* First purchase bonus banner */}
+        <div className="mt-4 rounded-xl border border-[#00fbfb]/20 bg-gradient-to-r from-[#00fbfb]/[0.06] to-[#568dff]/[0.06] px-4 py-3 flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00fbfb]/15 text-[#00fbfb] text-sm font-bold shrink-0">🎁</span>
+          <div>
+            <p className="text-sm font-medium text-on-surface">+20% токенов за первую покупку!</p>
+            <p className="text-xs text-on-surface-variant">Бонус начисляется автоматически при первом пополнении</p>
+          </div>
+        </div>
+
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {packs.map((p) => {
             const label = badgeLabel(p.badge);

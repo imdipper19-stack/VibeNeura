@@ -26,6 +26,14 @@ export const metadata: Metadata = {
     siteName: 'vibeneura',
     type: 'website',
     locale: 'ru_RU',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Vibeneura — все топовые ИИ в одном окне',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -93,7 +101,70 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div><img src="https://mc.yandex.ru/watch/108993121" style={{position:'absolute',left:'-9999px'}} alt="" /></div>
         </noscript>
       </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  name: 'Vibeneura',
+                  legalName: 'ОсОО «Глобал Бридж»',
+                  url: 'https://vibeneura.online',
+                  logo: 'https://vibeneura.online/favicon.svg',
+                  email: 'vibeneura@internet.ru',
+                  foundingDate: '2025',
+                },
+                {
+                  '@type': 'WebApplication',
+                  name: 'Vibeneura',
+                  url: 'https://vibeneura.online',
+                  applicationCategory: 'UtilitiesApplication',
+                  operatingSystem: 'Any',
+                  offers: {
+                    '@type': 'Offer',
+                    price: '0',
+                    priceCurrency: 'RUB',
+                  },
+                  description: 'Premium AI aggregator: GPT, Claude and more without a VPN.',
+                },
+                {
+                  '@type': 'FAQPage',
+                  mainEntity: [
+                    {
+                      '@type': 'Question',
+                      name: 'Нужен ли VPN для доступа к Vibeneura?',
+                      acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Нет. Все запросы проксируются через наш сервер. Vibeneura работает из любой точки мира без VPN.',
+                      },
+                    },
+                    {
+                      '@type': 'Question',
+                      name: 'Какие ИИ-модели доступны?',
+                      acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Бесплатно: Claude Haiku 4.5. Premium: Claude Opus 4.7, Claude Sonnet 4.6, GPT 5.5.',
+                      },
+                    },
+                    {
+                      '@type': 'Question',
+                      name: 'Как устроена оплата?',
+                      acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Два варианта: пакеты токенов (от 99 ₽, не сгорают) или PRO Pass (безлимит на 7/14/30 дней).',
+                      },
+                    },
+                  ],
+                },
+              ],
+            }),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

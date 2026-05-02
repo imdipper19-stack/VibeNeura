@@ -67,9 +67,21 @@ export async function POST(req: NextRequest) {
     });
 
     if (item.kind === 'TOKEN_PACK') {
+      // Check if this is user's first TOKEN_PACK purchase → +20% bonus
+      const previousPurchase = await db.transaction.findFirst({
+        where: {
+          userId: tx.userId,
+          type: TransactionType.TOKEN_PACK,
+          status: TransactionStatus.COMPLETED,
+          id: { not: tx.id },
+        },
+      });
+      const isFirstPurchase = !previousPurchase;
+      const tokensToAdd = isFirstPurchase ? Math.floor(item.tokens * 1.2) : item.tokens;
+
       await db.user.update({
         where: { id: tx.userId },
-        data: { tokenBalance: { increment: item.tokens } },
+        data: { tokenBalance: { increment: tokensToAdd } },
       });
     } else {
       const user = await db.user.findUnique({ where: { id: tx.userId } });

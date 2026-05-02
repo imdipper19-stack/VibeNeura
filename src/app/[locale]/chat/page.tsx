@@ -9,6 +9,7 @@ import { ModelSelector, type ModelOption } from '@/components/chat/model-selecto
 import { PaywallModal } from '@/components/billing/paywall-modal';
 import { DailyLimitModal } from '@/components/billing/daily-limit-modal';
 import { SystemPromptSettings } from '@/components/chat/system-prompt-settings';
+import { OnboardingTour } from '@/components/chat/onboarding-tour';
 import { useSettingsStore } from '@/store/settings-store';
 import { Sparkles, Code2, FileText, Languages, Lightbulb, ArrowDown, Search, ImagePlus, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -27,6 +28,7 @@ export default function ChatPage() {
   const { messages, streaming, modelSlug, chatId, addMessage, appendToAssistant, setStreaming, setModel, setChatId, setThinking, setSources, setDone } =
     useChatStore();
   const [models, setModels] = useState<ModelOption[]>([]);
+  const fontSize = useSettingsStore((s) => s.fontSize);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [dailyLimitOpen, setDailyLimitOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -207,6 +209,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-full flex-col">
+      <OnboardingTour />
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/5 bg-[#0d1514]/90 pl-14 pr-4 py-3 md:px-6 md:backdrop-blur-xl md:bg-[#0d1514]/70">
         <ModelSelector models={models} value={modelSlug} onChange={setModel} />
@@ -228,7 +231,7 @@ export default function ChatPage() {
             ]}
           />
         ) : (
-          <div className="mx-auto max-w-4xl py-6">
+          <div className="mx-auto max-w-4xl py-6" style={{ fontSize: `${fontSize}px` }}>
             {messages.map((m) => (
               <MessageBubble key={m.id} message={m} />
             ))}
