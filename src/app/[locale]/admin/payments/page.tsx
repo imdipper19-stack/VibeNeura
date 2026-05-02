@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Download } from 'lucide-react';
 
 interface Payment {
   id: string;
@@ -15,14 +16,50 @@ interface Payment {
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
-  useEffect(() => {
-    fetch('/api/admin/payments').then(r => r.json()).then(d => { setPayments(d.payments ?? []); setLoading(false); });
-  }, []);
+  const fetchPayments = useCallback(() => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (statusFilter) params.set('status', statusFilter);
+    if (typeFilter) params.set('type', typeFilter);
+    if (fromDate) params.set('from', fromDate);
+    if (toDate) params.set('to', toDate);
+    fetch(`/api/admin/payments?${params}`)
+      .then(r => r.json())
+      .then(d => { setPayments(d.payments ?? []); setLoading(false); });
+  }, [statusFilter, typeFilter, fromDate, toDate]);
+
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-white mb-6">Payments</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-white">Payments</h1>
+        <button onClick={() => window.open('/api/admin/export/payments')} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20">
+          <Download className="h-4 w-4" /> Export CSV
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none">
+          <option value="">All Statuses</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="FAILED">FAILED</option>
+          <option value="PENDING">PENDING</option>
+        </select>
+        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none">
+          <option value="">All Types</option>
+          <option value="TOKEN_PACK">TOKEN_PACK</option>
+          <option value="PRO_PASS">PRO_PASS</option>
+        </select>
+        <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none" />
+        <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none" />
+      </div>
+
       {loading ? (
         <p className="text-[#839493]">Loading...</p>
       ) : (

@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Settings,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
@@ -368,13 +369,23 @@ export function Sidebar({ chats: initialChats = [], onNavigate }: { chats?: Chat
       </div>
 
       {/* Email contact */}
-      <a
-        href="mailto:vibeneura@internet.ru"
-        className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
-      >
-        <Mail className="h-3.5 w-3.5" />
-        vibeneura@internet.ru
-      </a>
+      <div className="flex flex-col gap-1">
+        <Link
+          href={`/${locale}/settings`}
+          onClick={onNavigate}
+          className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+        >
+          <Settings className="h-3.5 w-3.5" />
+          {t('settings')}
+        </Link>
+        <a
+          href="mailto:vibeneura@internet.ru"
+          className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-on-surface-variant transition-colors hover:bg-white/5 hover:text-primary"
+        >
+          <Mail className="h-3.5 w-3.5" />
+          vibeneura@internet.ru
+        </a>
+      </div>
 
       {/* User menu */}
       <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2">

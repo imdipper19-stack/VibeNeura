@@ -43,6 +43,11 @@ enum TransactionStatus {
   REFUNDED
 }
 
+enum PromoType {
+  TOKENS
+  PRO_PASS
+}
+
 // NextAuth v5 — JWT session strategy.
 // We keep our domain User model and link OAuth identities via googleId / telegramId.
 model User {
@@ -52,6 +57,7 @@ model User {
   avatarUrl    String?
   role         Role      @default(USER)
   plan         PlanTier  @default(FREE)
+  banned       Boolean   @default(false)
   tokenBalance Int       @default(10000) // starter free tokens
   proPassUntil DateTime?
   locale       String    @default("ru")
@@ -77,6 +83,8 @@ model User {
   chats        Chat[]
   folders      Folder[]
   transactions Transaction[]
+  promoRedemptions PromoRedemption[]
+  auditLogs    AuditLog[]
 }
 
 model ModelRegistry {
@@ -170,4 +178,45 @@ model Transaction {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
+}
+
+model PromoCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  type        PromoType
+  value       Int
+  maxUses     Int?
+  usedCount   Int       @default(0)
+  enabled     Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  redemptions PromoRedemption[]
+}
+
+model PromoRedemption {
+  id          String   @id @default(cuid())
+  promoCodeId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, userId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String?
+  targetId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
 }

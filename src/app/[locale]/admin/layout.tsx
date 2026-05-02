@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import Link from 'next/link';
-import { LayoutDashboard, Users, CreditCard, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, ArrowLeft, BarChart3, Ticket, ClipboardList } from 'lucide-react';
 
 export default async function AdminLayout({
   children,
@@ -31,6 +31,9 @@ export default async function AdminLayout({
         <NavLink href={`/${locale}/admin`} icon={<LayoutDashboard className="h-4 w-4" />} label="Dashboard" />
         <NavLink href={`/${locale}/admin/users`} icon={<Users className="h-4 w-4" />} label="Users" />
         <NavLink href={`/${locale}/admin/payments`} icon={<CreditCard className="h-4 w-4" />} label="Payments" />
+        <NavLink href={`/${locale}/admin/models`} icon={<BarChart3 className="h-4 w-4" />} label="Models" />
+        <NavLink href={`/${locale}/admin/promos`} icon={<Ticket className="h-4 w-4" />} label="Promos" />
+        <NavLink href={`/${locale}/admin/audit`} icon={<ClipboardList className="h-4 w-4" />} label="Audit Log" />
       </aside>
       <main className="flex-1 p-8">{children}</main>
     </div>

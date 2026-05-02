@@ -96,6 +96,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
+        if (user.banned) return null;
+
         return {
           id: user.id,
           name: user.name,
@@ -119,6 +121,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.passwordHash) return null;
         if (!user.emailVerified) return null;
+        if (user.banned) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
@@ -155,9 +158,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           referralCode: await generateUniqueReferralCode(),
           referredById: referredById ?? undefined,
         },
+        select: { id: true, banned: true },
       });
       // Stash dbUser.id on the user object so jwt() picks it up.
       (user as any).id = dbUser.id;
+      if (dbUser.banned) return false;
       return true;
     },
     async jwt({ token, user }) {
