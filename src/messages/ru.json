@@ -71,7 +71,8 @@
   "models": {
     "free": "Бесплатно",
     "premium": "Premium",
-    "vision": "Зрение",
+    "vision": "зрение",
+    "files": "файлы",
     "selectModel": "Выбрать модель"
   },
   "auth": {

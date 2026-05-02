@@ -27,13 +27,13 @@ export default async function AdminLayout({
           <ArrowLeft className="h-4 w-4" />
           Назад в чат
         </Link>
-        <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-[#839493]/60">Admin</p>
-        <NavLink href={`/${locale}/admin`} icon={<LayoutDashboard className="h-4 w-4" />} label="Dashboard" />
-        <NavLink href={`/${locale}/admin/users`} icon={<Users className="h-4 w-4" />} label="Users" />
-        <NavLink href={`/${locale}/admin/payments`} icon={<CreditCard className="h-4 w-4" />} label="Payments" />
-        <NavLink href={`/${locale}/admin/models`} icon={<BarChart3 className="h-4 w-4" />} label="Models" />
-        <NavLink href={`/${locale}/admin/promos`} icon={<Ticket className="h-4 w-4" />} label="Promos" />
-        <NavLink href={`/${locale}/admin/audit`} icon={<ClipboardList className="h-4 w-4" />} label="Audit Log" />
+        <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-[#839493]/60">Панель управления</p>
+        <NavLink href={`/${locale}/admin`} icon={<LayoutDashboard className="h-4 w-4" />} label="Обзор" />
+        <NavLink href={`/${locale}/admin/users`} icon={<Users className="h-4 w-4" />} label="Пользователи" />
+        <NavLink href={`/${locale}/admin/payments`} icon={<CreditCard className="h-4 w-4" />} label="Платежи" />
+        <NavLink href={`/${locale}/admin/models`} icon={<BarChart3 className="h-4 w-4" />} label="Модели" />
+        <NavLink href={`/${locale}/admin/promos`} icon={<Ticket className="h-4 w-4" />} label="Промокоды" />
+        <NavLink href={`/${locale}/admin/audit`} icon={<ClipboardList className="h-4 w-4" />} label="Журнал действий" />
       </aside>
       <main className="flex-1 p-8">{children}</main>
     </div>

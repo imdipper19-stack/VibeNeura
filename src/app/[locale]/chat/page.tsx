@@ -208,7 +208,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/5 bg-[#0d1514]/90 px-4 py-3 md:px-6 md:backdrop-blur-xl md:bg-[#0d1514]/70">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/5 bg-[#0d1514]/90 pl-14 pr-4 py-3 md:px-6 md:backdrop-blur-xl md:bg-[#0d1514]/70">
         <ModelSelector models={models} value={modelSlug} onChange={setModel} />
         <div className="flex items-center gap-2">
           <SystemPromptSettings />

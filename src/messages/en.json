@@ -71,7 +71,8 @@
   "models": {
     "free": "Free",
     "premium": "Premium",
-    "vision": "Vision",
+    "vision": "vision",
+    "files": "files",
     "selectModel": "Select model"
   },
   "auth": {

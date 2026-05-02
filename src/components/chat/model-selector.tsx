@@ -60,12 +60,12 @@ export function ModelSelector({
         <div className="hidden sm:flex items-center gap-1">
           {selected.supportsVision && (
             <span className="rounded-full bg-secondary-container/30 px-1.5 py-0.5 text-[10px] text-secondary inline-flex items-center gap-0.5">
-              <Eye className="h-2.5 w-2.5" /> vision
+              <Eye className="h-2.5 w-2.5" /> {t('vision')}
             </span>
           )}
           {selected.supportsFiles && (
             <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary inline-flex items-center gap-0.5">
-              <FileText className="h-2.5 w-2.5" /> files
+              <FileText className="h-2.5 w-2.5" /> {t('files')}
             </span>
           )}
         </div>
@@ -124,6 +124,7 @@ function ModelGroup({
   onChange: (slug: string) => void;
   accent: 'primary' | 'tertiary';
 }) {
+  const t = useTranslations('models');
   return (
     <div>
       <div className="px-2 py-1 text-[10px] uppercase tracking-widest text-on-surface-variant/70">
@@ -165,12 +166,12 @@ function ModelGroup({
                   <div className="mt-1.5 flex gap-1.5">
                     {m.supportsVision && (
                       <span className="rounded-full bg-secondary-container/30 px-1.5 py-0.5 text-[10px] text-secondary inline-flex items-center gap-0.5">
-                        <Eye className="h-2.5 w-2.5" /> vision
+                        <Eye className="h-2.5 w-2.5" /> {t('vision')}
                       </span>
                     )}
                     {m.supportsFiles && (
                       <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary inline-flex items-center gap-0.5">
-                        <FileText className="h-2.5 w-2.5" /> files
+                        <FileText className="h-2.5 w-2.5" /> {t('files')}
                       </span>
                     )}
                   </div>

@@ -3,12 +3,18 @@ import { FALLBACK_MODELS } from '@/lib/ai/models';
 
 export const runtime = 'nodejs';
 
+/** Map slug → Russian description. Used when models come from DB (which has no descriptionRu column). */
+const RU_DESCRIPTIONS: Record<string, string> = {};
+for (const m of FALLBACK_MODELS) {
+  RU_DESCRIPTIONS[m.slug] = m.descriptionRu;
+}
+
 export async function GET(req: NextRequest) {
   const locale = req.nextUrl.searchParams.get('locale') ?? 'ru';
 
   try {
     const { prisma } = await import('@/lib/prisma/client');
-    const models = await prisma.modelRegistry.findMany({
+    const dbModels = await prisma.modelRegistry.findMany({
       where: { enabled: true },
       orderBy: { sortOrder: 'asc' },
       select: {
@@ -21,7 +27,16 @@ export async function GET(req: NextRequest) {
         supportsFiles: true,
       },
     });
-    if (models.length) return NextResponse.json({ models });
+    if (dbModels.length) {
+      const models = dbModels.map((m) => ({
+        ...m,
+        description:
+          locale === 'ru'
+            ? RU_DESCRIPTIONS[m.slug] ?? m.description
+            : m.description,
+      }));
+      return NextResponse.json({ models });
+    }
   } catch {
     // ignore — fallback below
   }

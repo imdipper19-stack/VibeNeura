@@ -87,15 +87,15 @@ export default function AdminModelsPage() {
 
   const top10 = stats.slice(0, 10);
 
-  if (loading) return <p className="text-[#839493]">Loading...</p>;
+  if (loading) return <p className="text-[#839493]">Загрузка...</p>;
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-white mb-6">Models</h1>
+      <h1 className="text-2xl font-semibold text-white mb-6">Модели</h1>
 
       {top10.length > 0 && (
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 mb-6">
-          <p className="text-sm text-[#839493] mb-4">Top Models by Requests (30 days)</p>
+          <p className="text-sm text-[#839493] mb-4">Топ моделей по запросам (30 дней)</p>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={top10} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
@@ -112,15 +112,15 @@ export default function AdminModelsPage() {
         <table className="w-full text-sm text-left">
           <thead className="border-b border-white/[0.06] text-[#839493]">
             <tr>
-              <th className="px-4 py-3">Model</th>
-              <th className="px-4 py-3">Provider</th>
-              <th className="px-4 py-3">Tier</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Input $/M</th>
-              <th className="px-4 py-3">Output $/M</th>
-              <th className="px-4 py-3">Multiplier</th>
-              <th className="px-4 py-3">Order</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">Модель</th>
+              <th className="px-4 py-3">Провайдер</th>
+              <th className="px-4 py-3">Тариф</th>
+              <th className="px-4 py-3">Статус</th>
+              <th className="px-4 py-3">Вход $/M</th>
+              <th className="px-4 py-3">Выход $/M</th>
+              <th className="px-4 py-3">Множитель</th>
+              <th className="px-4 py-3">Порядок</th>
+              <th className="px-4 py-3">Действия</th>
             </tr>
           </thead>
           <tbody className="text-white">
@@ -134,10 +134,10 @@ export default function AdminModelsPage() {
                   </td>
                   <td className="px-4 py-3">{m.provider}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded px-2 py-0.5 text-xs ${m.tier === 'PREMIUM' ? 'bg-purple-500/20 text-purple-400' : 'bg-white/10 text-[#839493]'}`}>{m.tier}</span>
+                    <span className={`rounded px-2 py-0.5 text-xs ${m.tier === 'PREMIUM' ? 'bg-purple-500/20 text-purple-400' : 'bg-white/10 text-[#839493]'}`}>{m.tier === 'PREMIUM' ? 'Премиум' : 'Бесплатный'}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => toggleEnabled(m)} title={m.enabled ? 'Disable' : 'Enable'}>
+                    <button onClick={() => toggleEnabled(m)} title={m.enabled ? 'Отключить' : 'Включить'}>
                       {m.enabled ? <ToggleRight className="h-5 w-5 text-green-400" /> : <ToggleLeft className="h-5 w-5 text-[#839493]" />}
                     </button>
                   </td>
@@ -149,7 +149,7 @@ export default function AdminModelsPage() {
                       <td className="px-4 py-3"><input type="number" value={ed.sortOrder ?? ''} onChange={e => updateField(m.id, 'sortOrder', e.target.value)} className="w-14 rounded border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none" /></td>
                       <td className="px-4 py-3 flex gap-1">
                         <button onClick={() => saveEdit(m.id)} disabled={saving === m.id} className="rounded bg-green-500/20 px-2 py-1 text-xs text-green-400 hover:bg-green-500/30"><Save className="h-3 w-3" /></button>
-                        <button onClick={() => setEditing(prev => { const n = { ...prev }; delete n[m.id]; return n; })} className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20">Cancel</button>
+                        <button onClick={() => setEditing(prev => { const n = { ...prev }; delete n[m.id]; return n; })} className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20">Отмена</button>
                       </td>
                     </>
                   ) : (
@@ -159,7 +159,7 @@ export default function AdminModelsPage() {
                       <td className="px-4 py-3 text-xs">{m.tokenMultiplier}</td>
                       <td className="px-4 py-3 text-xs">{m.sortOrder}</td>
                       <td className="px-4 py-3">
-                        <button onClick={() => startEdit(m)} className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20">Edit</button>
+                        <button onClick={() => startEdit(m)} className="rounded bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20">Изменить</button>
                       </td>
                     </>
                   )}

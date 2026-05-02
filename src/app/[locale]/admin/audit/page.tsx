@@ -34,23 +34,23 @@ export default function AdminAuditPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-white mb-6">Audit Log</h1>
+      <h1 className="text-2xl font-semibold text-white mb-6">Журнал действий</h1>
 
       {loading ? (
-        <p className="text-[#839493]">Loading...</p>
+        <p className="text-[#839493]">Загрузка...</p>
       ) : logs.length === 0 ? (
-        <p className="text-[#839493]">No audit entries yet.</p>
+        <p className="text-[#839493]">Записей пока нет.</p>
       ) : (
         <>
           <div className="overflow-x-auto rounded-xl border border-white/[0.06]">
             <table className="w-full text-sm text-left">
               <thead className="border-b border-white/[0.06] text-[#839493]">
                 <tr>
-                  <th className="px-4 py-3">Admin</th>
-                  <th className="px-4 py-3">Action</th>
-                  <th className="px-4 py-3">Target</th>
-                  <th className="px-4 py-3">Details</th>
-                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Администратор</th>
+                  <th className="px-4 py-3">Действие</th>
+                  <th className="px-4 py-3">Цель</th>
+                  <th className="px-4 py-3">Детали</th>
+                  <th className="px-4 py-3">Дата</th>
                 </tr>
               </thead>
               <tbody className="text-white">
